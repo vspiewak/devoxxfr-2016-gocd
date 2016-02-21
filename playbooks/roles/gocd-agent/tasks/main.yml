@@ -1,0 +1,70 @@
+- name: Install GoCD APT repository
+  lineinfile: dest=/etc/apt/sources.list.d/gocd.list regexp=^deb line="deb http://dl.bintray.com/gocd/gocd-deb/ /" create=yes state=present
+
+- name: Install GoCD APT key
+  apt_key: url=https://bintray.com/user/downloadSubjectPublicKey?username=gocd state=present
+
+- name: Update APT
+  apt: update_cache=yes
+
+- name: Install zip utils
+  apt:
+    pkg="{{item}}"
+    state=present
+  with_items:
+    - zip
+    - unzip
+
+- name: Install bzip2
+  apt:
+    pkg=bzip2
+    state=present
+
+- name: Install build-essential
+  apt:
+    pkg=build-essential
+    state=present
+
+- name: Install libfontconfig1
+  apt:
+    pkg=libfontconfig1
+    state=present
+
+- name: Install Git
+  apt:
+    pkg=git
+    state=present
+
+- name: Install GoCD agent
+  apt:
+    pkg=go-agent
+    state=present
+
+- name: Create ~/.ssh directory
+  file: path=/var/go/.ssh state=directory owner=go group=go mode=0700
+
+- name: Delete known_hosts
+  file: path=~/.ssh/known_hosts state=absent
+  sudo: yes
+  sudo_user: go
+
+- name: Configure Github as a known host
+  lineinfile:
+    dest: ~/.ssh/known_hosts
+    create: yes
+    state: present
+    line: "{{ lookup('pipe', 'ssh-keyscan -t rsa github.com') }}"
+    regexp: "^github\\.com"
+  sudo: yes
+  sudo_user: go
+
+- debug: var=inventory_hostname
+
+- name: Configure agent auto registration
+  lineinfile: dest=/var/lib/go-agent/config/autoregister.properties regexp=^agent.auto.register.key= line="agent.auto.register.key=123456789abcdef" create=yes state=present
+  lineinfile: dest=/var/lib/go-agent/config/autoregister.properties regexp=^agent.auto.register.hostname= line="agent.auto.register.hostname={{inventory_hostname}}" create=yes state=present
+  notify: Restart GoCD agent
+
+- name: Configure GO_SERVER environment variable
+  lineinfile: dest=/etc/default/go-agent regexp=^GO_SERVER= line="GO_SERVER={{gocd_server.ansible_eth1.ipv4.address}}" state=present
+  notify: Restart GoCD agent

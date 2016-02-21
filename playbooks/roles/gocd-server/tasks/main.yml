@@ -1,0 +1,51 @@
+- name: Install GoCD APT repository
+  lineinfile: dest=/etc/apt/sources.list.d/gocd.list regexp=^deb line="deb http://dl.bintray.com/gocd/gocd-deb/ /" create=yes state=present
+
+- name: Install GoCD APT key
+  apt_key: url=https://bintray.com/user/downloadSubjectPublicKey?username=gocd state=present
+
+- name: Update APT
+  apt: update_cache=yes
+
+- name: Install GoCD server
+  apt:
+    pkg=go-server
+    state=present
+  notify: Restart GoCD server
+
+- name: Install Git
+  apt:
+    pkg=git
+    state=present
+
+- name: Install apache2-utils
+  apt:
+    pkg=apache2-utils
+    state=present
+
+- name: Create ~/.ssh directory
+  file: path=/var/go/.ssh state=directory owner=go group=go mode=0700
+
+- name: Configure Github as a known host
+  lineinfile:
+    dest: ~/.ssh/known_hosts
+    create: yes
+    state: present
+    line: "{{ lookup('pipe', 'ssh-keyscan -t rsa github.com') }}"
+    regexp: "^github\\.com"
+  sudo: yes
+  sudo_user: go
+
+- name: Configure vspiewak user (X@2rAswuda)
+  lineinfile: dest=/var/go/passwd regexp='^vspiewak' line='vspiewak:{SHA}vi3iBT8hegvho/8h+Y92EK9f4Qw=' create=yes state=present owner=go group=go mode=0644
+
+- name: Configure cipher
+  copy: src=cipher dest=/etc/go/cipher owner=go group=go mode=0644
+
+- name: Configure go-server default
+  template: src=default.j2 dest=/etc/default/go-server owner=go group=go mode=0644
+  notify: Restart GoCD server
+
+- name: Configure cruise-config.xml
+  template: src=cruise-config.xml.j2 dest=/etc/go/cruise-config.xml owner=go group=go mode=0644
+  notify: Restart GoCD server

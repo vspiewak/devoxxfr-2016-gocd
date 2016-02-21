@@ -1,0 +1,7 @@
+timezone: "Europe/Paris"
+
+version:
+  java: "8u66+8u65arm-1~webupd8~1"
+
+gocd_server_group: "gocd-server"
+gocd_server: "{{ hostvars[groups[gocd_server_group][0]] }}"

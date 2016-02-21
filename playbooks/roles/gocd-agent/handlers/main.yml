@@ -1,0 +1,7 @@
+---
+# handlers
+
+- name: Restart GoCD agent
+  service:
+    name=go-agent
+    state=restarted

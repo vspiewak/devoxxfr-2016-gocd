@@ -1,0 +1,8 @@
+- hosts: "gocd-server"
+  user: vagrant
+  sudo: yes
+
+  roles:
+    - common
+    - java
+    - gocd-server

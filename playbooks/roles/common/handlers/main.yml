@@ -1,0 +1,10 @@
+---
+# handlers
+
+- name: Update Timezone
+  command: dpkg-reconfigure --frontend noninteractive tzdata
+
+- name: Restart NTP
+  service:
+    name=ntp
+    state=restarted

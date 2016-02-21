@@ -1,0 +1,29 @@
+- name: Check current timezone
+  shell: cat /etc/timezone
+  changed_when: false
+  register: current_timezone
+
+- name: Set timezone
+  copy: content="{{ timezone }}" dest=/etc/timezone
+  when: current_timezone.stdout != timezone
+  notify: Update Timezone
+
+- name: Update APT
+  apt: update_cache=yes
+
+- name: Install curl
+  apt:
+    pkg=curl
+    state=present
+
+- name: Install NTP
+  apt:
+    pkg=ntp
+    state=present
+  notify: Restart NTP
+
+- name: Enable NTP service at boot
+  service:
+    name=ntp
+    enabled=yes
+    state=started
