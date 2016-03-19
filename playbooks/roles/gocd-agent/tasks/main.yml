@@ -37,7 +37,7 @@
 
 - name: Install GoCD agent
   apt:
-    pkg=go-agent
+    pkg="go-agent={{version.go_agent}}"
     state=present
 
 - name: Create ~/.ssh directory
@@ -58,10 +58,11 @@
   sudo: yes
   sudo_user: go
 
-- debug: var=inventory_hostname
-
-- name: Configure agent auto registration
+- name: Configure agent auto registration key
   lineinfile: dest=/var/lib/go-agent/config/autoregister.properties regexp=^agent.auto.register.key= line="agent.auto.register.key=123456789abcdef" create=yes state=present
+  notify: Restart GoCD agent
+
+- name: Configure agent hostname
   lineinfile: dest=/var/lib/go-agent/config/autoregister.properties regexp=^agent.auto.register.hostname= line="agent.auto.register.hostname={{inventory_hostname}}" create=yes state=present
   notify: Restart GoCD agent
 

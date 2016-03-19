@@ -9,7 +9,7 @@
 
 - name: Install GoCD server
   apt:
-    pkg=go-server
+    pkg="go-server={{version.go_server}}"
     state=present
   notify: Restart GoCD server
 
