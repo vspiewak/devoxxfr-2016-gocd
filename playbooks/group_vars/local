@@ -1,0 +1,29 @@
+keypair: "{{ lookup('env','PEM_NAME') }}"
+
+amazon:
+  client: "{{client}}"
+  env: "{{env}}"
+  vpc:
+    id: "{{vpc_id}}"
+    subnet: "{{subnet_id}}"
+  instances:
+    gocd_server:
+      ami: ami-116d857a
+      type: t2.micro
+      count: 1
+      role: gocd
+      security_group:
+        rules:
+          - { proto: tcp, from_port: 22, to_port: 22, cidr_ip: 0.0.0.0/0 }
+          - { proto: tcp, from_port: 8153, to_port: 8153, cidr_ip: 0.0.0.0/0 }
+          - { proto: tcp, from_port: 8154, to_port: 8154, cidr_ip: 0.0.0.0/0 }
+    gocd_agent:
+      ami: ami-116d857a
+      type: t2.micro
+      count: 2
+      role: gocd
+      security_group:
+        rules:
+          - { proto: tcp, from_port: 22, to_port: 22, cidr_ip: 0.0.0.0/0 }
+          - { proto: tcp, from_port: 8153, to_port: 8153, cidr_ip: 0.0.0.0/0 }
+          - { proto: tcp, from_port: 8154, to_port: 8154, cidr_ip: 0.0.0.0/0 }

@@ -67,5 +67,5 @@
   notify: Restart GoCD agent
 
 - name: Configure GO_SERVER environment variable
-  lineinfile: dest=/etc/default/go-agent regexp=^GO_SERVER= line="GO_SERVER={{gocd_server.ansible_eth1.ipv4.address}}" state=present
+  lineinfile: dest=/etc/default/go-agent regexp=^GO_SERVER= line="GO_SERVER={{gocd_server.ec2_private_ip_address}}" state=present
   notify: Restart GoCD agent

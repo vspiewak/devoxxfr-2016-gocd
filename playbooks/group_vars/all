@@ -1,3 +1,8 @@
+client: "{{ lookup('env','CLIENT') }}"
+env: "{{ lookup('env','ENV') }}"
+vpc_id: "{{ lookup('env','VPC_ID') }}"
+subnet_id: "{{ lookup('env','SUBNET_ID') }}"
+
 version:
   java: "8u72+8u71arm-1~webupd8~0"
   go_server: "13.1.1-16714"
@@ -5,7 +10,7 @@ version:
 
 timezone: "Europe/Paris"
 
-gocd_server_group: "gocd-server"
+gocd_server_group: "{{client}}_{{env}}_gocd_server"
 gocd_server: "{{ hostvars[groups[gocd_server_group][0]] }}"
 
 nvm:

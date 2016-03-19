@@ -1,0 +1,5 @@
+---
+# file: site.yml
+
+- include: gocd-server.yml
+- include: gocd-agent.yml

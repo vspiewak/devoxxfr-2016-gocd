@@ -1,5 +1,5 @@
-- hosts: "gocd-server"
-  user: vagrant
+- hosts: "{{lookup('env','CLIENT')}}_{{lookup('env','ENV')}}_gocd_server"
+  user: admin
   sudo: yes
 
   roles:

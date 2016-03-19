@@ -1,5 +1,5 @@
-- hosts: "gocd-agent"
-  user: vagrant
+- hosts: "{{lookup('env','CLIENT')}}_{{lookup('env','ENV')}}_gocd_agent"
+  user: admin
   sudo: yes
 
   roles:
