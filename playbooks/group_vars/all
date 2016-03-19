@@ -1,7 +1,15 @@
-timezone: "Europe/Paris"
-
 version:
-  java: "8u66+8u65arm-1~webupd8~1"
+  java: "8u72+8u71arm-1~webupd8~0"
+  go_server: "13.1.1-16714"
+  go_agent: "13.1.1-16714"
+
+timezone: "Europe/Paris"
 
 gocd_server_group: "gocd-server"
 gocd_server: "{{ hostvars[groups[gocd_server_group][0]] }}"
+
+nvm:
+  user: go
+  group: go
+  version: v0.31.0
+  node_version: v5.6.0

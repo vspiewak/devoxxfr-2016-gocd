@@ -6,3 +6,4 @@
     - common
     - java
     - gocd-agent
+    - nvm
