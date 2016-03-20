@@ -7,6 +7,15 @@ amazon:
     id: "{{vpc_id}}"
     subnet: "{{subnet_id}}"
   instances:
+    haproxy:
+      ami: ami-116d857a
+      type: t2.micro
+      count: 1
+      role: haproxy
+      security_group:
+        rules:
+          - { proto: tcp, from_port: 22, to_port: 22, cidr_ip: 0.0.0.0/0 }
+          - { proto: tcp, from_port: 80, to_port: 80, cidr_ip: 0.0.0.0/0 }
     gocd_server:
       ami: ami-116d857a
       type: t2.micro
@@ -20,10 +29,37 @@ amazon:
     gocd_agent:
       ami: ami-116d857a
       type: t2.micro
-      count: 2
+      count: 1
       role: gocd
       security_group:
         rules:
           - { proto: tcp, from_port: 22, to_port: 22, cidr_ip: 0.0.0.0/0 }
           - { proto: tcp, from_port: 8153, to_port: 8153, cidr_ip: 0.0.0.0/0 }
           - { proto: tcp, from_port: 8154, to_port: 8154, cidr_ip: 0.0.0.0/0 }
+    hubot:
+      ami: ami-116d857a
+      type: t2.micro
+      count: 1
+      role: hubot
+      security_group:
+        rules:
+          - { proto: tcp, from_port: 22, to_port: 22, cidr_ip: 0.0.0.0/0 }
+          - { proto: tcp, from_port: 80, to_port: 80, cidr_ip: 0.0.0.0/0 }
+    node_dev:
+      ami: ami-116d857a
+      type: t2.micro
+      count: 1
+      role: node
+      security_group:
+        rules:
+          - { proto: tcp, from_port: 22, to_port: 22, cidr_ip: 0.0.0.0/0 }
+          - { proto: tcp, from_port: 80, to_port: 80, cidr_ip: 0.0.0.0/0 }
+    node_demo:
+      ami: ami-116d857a
+      type: t2.micro
+      count: 1
+      role: node
+      security_group:
+        rules:
+          - { proto: tcp, from_port: 22, to_port: 22, cidr_ip: 0.0.0.0/0 }
+          - { proto: tcp, from_port: 80, to_port: 80, cidr_ip: 0.0.0.0/0 }

@@ -1,0 +1,7 @@
+- hosts: "{{lookup('env','CLIENT')}}_{{lookup('env','ENV')}}_node_dev,{{lookup('env','CLIENT')}}_{{lookup('env','ENV')}}_node_demo"
+  user: admin
+  sudo: yes
+
+  roles:
+    - common
+    - nvm

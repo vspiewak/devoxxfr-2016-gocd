@@ -51,6 +51,12 @@ Use the default VPC or create one with a public subnet
     export SUBNET_ID=<public_subnet_id>
 
 
+Configure hubot
+---------------
+
+    export HUBOT_SLACK_TOKEN=<xoxb-*******-*********************>
+
+
 Create EC2 instances
 --------------------
 
@@ -64,8 +70,11 @@ Configure EC2 instances
 
     <or>
 
+    ansible-playbook -i inventory/ec2.py playbooks/haproxy.yml
     ansible-playbook -i inventory/ec2.py playbooks/gocd-server.yml
     ansible-playbook -i inventory/ec2.py playbooks/gocd-agent.yml
+    ansible-playbook -i inventory/ec2.py playbooks/hubot.yml
+    ansible-playbook -i inventory/ec2.py playbooks/nodes.yml
 
 
 You can browse
