@@ -1,0 +1,12 @@
+nvm:
+  user: "admin"
+  group: "admin"
+  version: v0.31.0
+  node_version: v5.6.0
+
+hubot:
+  user: "admin"
+  group: "admin"
+  git: "https://github.com/vspiewak/nono.git"
+  env_vars:
+    - { key: "HUBOT_SLACK_TOKEN", value: "{{ lookup('env','HUBOT_SLACK_TOKEN') }}" }

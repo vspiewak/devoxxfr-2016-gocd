@@ -1,0 +1,28 @@
+- name: Create hubot group
+  group: name="{{hubot.group}}" state=present
+
+- name: Create hubot user
+  user: name="{{hubot.user}}" group="{{hubot.group}}"
+
+- name: Checkout hubot repository
+  git: repo="{{hubot.git}}" dest=/opt/hubot clone=yes update=yes
+  notify: Restart Hubot server
+
+- name: 'Set file permissions on plugins'
+  file: path=/opt/hubot owner="{{hubot.user}}" group="{{hubot.group}}" state=touch state=directory mode=0755
+
+- name: Install Systemd
+  apt:
+    pkg="systemd"
+    state=present
+
+- name: Install hubot
+  shell: sudo -iu {{ hubot.user }} npm install /opt/hubot
+  notify: Restart Hubot server
+
+- name: Configure hubot service
+  template: src=hubot.service.j2 dest=/etc/systemd/system/hubot.service owner=root group=root mode=0744
+  notify: Restart Hubot server
+
+- name: Enable hubot service at boot
+  service: name=hubot enabled=yes

@@ -1,0 +1,7 @@
+---
+# handlers
+
+- name: Restart Hubot server
+  service:
+    name=hubot
+    state=restarted

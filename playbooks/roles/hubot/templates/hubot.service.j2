@@ -1,0 +1,26 @@
+; Hubot systemd service unit file
+; Place in e.g. `/etc/systemd/system/hubot.service`, then `systemctl daemon-reload` and `service hubot start`.
+
+[Unit]
+Description=Hubot
+Requires=network.target
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/hubot
+User={{hubot.user}}
+
+Restart=always
+RestartSec=10
+
+; Configure Hubot environment variables, make sure to use quotes around whitespace as shown below.
+; Environment=HUBOT_aaa=xxx "HUBOT_bbb='yyy yyy'"
+
+ExecStart=/bin/bash -c ". ~/.nvm/nvm.sh; \
+{% for an_env_var in hubot.env_vars %}{{ an_env_var.key }}='{{ an_env_var.value }}' \
+{% endfor %}
+./bin/hubot --adapter slack"
+
+[Install]
+WantedBy=multi-user.target

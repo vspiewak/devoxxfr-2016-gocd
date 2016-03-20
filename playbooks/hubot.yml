@@ -1,0 +1,8 @@
+- hosts: "{{lookup('env','CLIENT')}}_{{lookup('env','ENV')}}_hubot"
+  user: admin
+  sudo: yes
+
+  roles:
+    - common
+    - nvm
+    - hubot
