@@ -1,0 +1,7 @@
+- hosts: "{{lookup('env','CLIENT')}}_{{lookup('env','ENV')}}_haproxy"
+  user: admin
+  sudo: yes
+
+  roles:
+    - common
+    - haproxy

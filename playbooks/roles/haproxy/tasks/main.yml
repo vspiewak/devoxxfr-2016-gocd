@@ -1,0 +1,15 @@
+- name: Add jessie-backports repository
+  apt_repository: repo='deb http://httpredir.debian.org/debian jessie-backports main' state=present
+
+- name: Install HAProxy
+  apt:
+    pkg="haproxy"
+    state=present
+    update_cache=yes
+
+- name: Configure HAProxy
+  template: src=haproxy.cfg.j2 dest=/etc/haproxy/haproxy.cfg owner=root group=root mode=0644
+  notify: Restart HAProxy
+
+- name: Enable HAProxy service at boot
+  service: name=haproxy enabled=yes

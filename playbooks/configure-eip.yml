@@ -1,0 +1,8 @@
+- hosts: "{{lookup('env','CLIENT')}}_{{lookup('env','ENV')}}_haproxy"
+  gather_facts: true
+  connection: local
+
+  tasks:
+
+    - name: Associate EIP to HAProxy
+      ec2_eip: device_id={{hostvars[inventory_hostname].ec2_id}} in_vpc=true reuse_existing_ip_allowed=yes
