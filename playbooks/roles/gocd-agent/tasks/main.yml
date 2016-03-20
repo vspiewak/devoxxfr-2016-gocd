@@ -37,7 +37,7 @@
 
 - name: Install GoCD agent
   apt:
-    pkg="go-agent={{version.go_agent}}"
+    pkg="go-agent"
     state=present
 
 - name: Create ~/.ssh directory
@@ -69,3 +69,6 @@
 - name: Configure GO_SERVER environment variable
   lineinfile: dest=/etc/default/go-agent regexp=^GO_SERVER= line="GO_SERVER={{gocd_server.ec2_private_ip_address}}" state=present
   notify: Restart GoCD agent
+
+- name: Enable go-agent service at boot
+  service: name=go-agent enabled=yes

@@ -5,8 +5,8 @@ subnet_id: "{{ lookup('env','SUBNET_ID') }}"
 
 version:
   java: "8u72+8u71arm-1~webupd8~0"
-  go_server: "13.1.1-16714"
-  go_agent: "13.1.1-16714"
+  go_server: "16.1.0-2855"
+  go_agent: "16.1.0-2855"
 
 timezone: "Europe/Paris"
 

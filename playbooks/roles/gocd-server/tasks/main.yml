@@ -9,7 +9,7 @@
 
 - name: Install GoCD server
   apt:
-    pkg="go-server={{version.go_server}}"
+    pkg="go-server"
     state=present
   notify: Restart GoCD server
 
@@ -46,6 +46,9 @@
   template: src=default.j2 dest=/etc/default/go-server owner=go group=go mode=0644
   notify: Restart GoCD server
 
-- name: Configure cruise-config.xml
-  template: src=cruise-config.xml.j2 dest=/etc/go/cruise-config.xml owner=go group=go mode=0644
-  notify: Restart GoCD server
+#- name: Configure cruise-config.xml
+#  template: src=cruise-config.xml.j2 dest=/etc/go/cruise-config.xml owner=go group=go mode=0644
+#  notify: Restart GoCD server
+
+- name: Enable go-server service at boot
+  service: name=go-server enabled=yes
