@@ -1,0 +1,7 @@
+---
+# handlers
+
+- name: Restart NGiNX
+  service:
+    name=nginx
+    state=restarted

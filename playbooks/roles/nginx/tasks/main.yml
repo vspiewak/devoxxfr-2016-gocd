@@ -1,0 +1,18 @@
+- name: Install NGiNX
+  apt:
+    pkg="nginx"
+    state=present
+
+- name: Create root site folder
+  file: path=/home/admin/app state=directory owner=admin group=admin mode=0755
+
+- name: Configure NGiNX default available site
+  template: src=default.j2 dest=/etc/nginx/sites-available/default owner=root group=root mode=0644
+  notify: Restart NGiNX
+
+- name: Configure NGiNX default enabled site
+  template: src=default.j2 dest=/etc/nginx/sites-enabled/default owner=root group=root mode=0644
+  notify: Restart NGiNX
+
+- name: Enable NGiNX service at boot
+  service: name=nginx enabled=yes
