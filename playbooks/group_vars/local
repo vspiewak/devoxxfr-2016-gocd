@@ -10,7 +10,7 @@ amazon:
     haproxy:
       ami: ami-116d857a
       type: t2.micro
-      count: 0
+      count: 1
       role: haproxy
       security_group:
         rules:
@@ -42,7 +42,7 @@ amazon:
     hubot:
       ami: ami-116d857a
       type: t2.micro
-      count: 0
+      count: 1
       role: hubot
       security_group:
         rules:
