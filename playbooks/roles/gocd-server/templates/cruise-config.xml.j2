@@ -1,3 +1,153 @@
+<?xml version="1.0" encoding="utf-8"?>
 <cruise xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="cruise-config.xsd" schemaVersion="77">
-  <server artifactsdir="artifacts" agentAutoRegisterKey="123456789abcdef" commandRepositoryLocation="default" />
+  <server artifactsdir="artifacts" commandRepositoryLocation="default" />
+  <pipelines group="Boilerplate">
+    <pipeline name="Build" labeltemplate="${boilerplate[:7]}" isLocked="false">
+      <trackingtool link="https://github.com/vspiewak/react-redux-boilerplate/issues/${ID}" regex="##(\d+)" />
+      <materials>
+        <git url="https://github.com/vspiewak/react-redux-boilerplate.git" materialName="boilerplate" />
+      </materials>
+      <stage name="npm" cleanWorkingDir="true">
+        <jobs>
+          <job name="package">
+            <tasks>
+              <exec command="npm">
+                <arg>install</arg>
+                <runif status="passed" />
+              </exec>
+              <exec command="npm">
+                <arg>run</arg>
+                <arg>lint</arg>
+                <runif status="passed" />
+              </exec>
+              <exec command="npm">
+                <arg>run</arg>
+                <arg>test</arg>
+                <runif status="passed" />
+              </exec>
+              <exec command="npm">
+                <arg>run</arg>
+                <arg>build</arg>
+                <runif status="passed" />
+              </exec>
+              <exec command="/bin/bash">
+                <arg>-c</arg>
+                <arg>PKG_ID=$GO_PIPELINE_LABEL npm run package</arg>
+                <runif status="passed" />
+              </exec>
+              <exec command="/bin/bash">
+                <arg>-c</arg>
+                <arg>DIST_ID=$GO_PIPELINE_LABEL npm run dist</arg>
+                <runif status="passed" />
+              </exec>
+            </tasks>
+            <artifacts>
+              <artifact src="pkg*.zip" dest="pkg" />
+              <artifact src="dist*.zip" dest="dist" />
+            </artifacts>
+          </job>
+        </jobs>
+      </stage>
+    </pipeline>
+    <pipeline name="DeployToDev" labeltemplate="${boilerplate[:7]}" isLocked="false">
+      <trackingtool link="https://github.com/vspiewak/react-redux-boilerplate/issues/${ID}" regex="##(\d+)" />
+      <materials>
+        <pipeline pipelineName="Build" stageName="npm" materialName="boilerplate" />
+      </materials>
+      <stage name="deployStage" fetchMaterials="false" cleanWorkingDir="true">
+        <jobs>
+          <job name="deployJob">
+            <tasks>
+              <fetchartifact pipeline="Build" stage="npm" job="package" srcdir="pkg">
+                <runif status="passed" />
+              </fetchartifact>
+              <exec command="/bin/bash">
+                <arg>-c</arg>
+                <arg>ssh -i $DEPLOY_KEY $DEPLOY_USER@$DEPLOY_HOST "rm -rf ~/app"</arg>
+                <runif status="passed" />
+              </exec>
+              <exec command="/bin/bash">
+                <arg>-c</arg>
+                <arg>ssh -i $DEPLOY_KEY $DEPLOY_USER@$DEPLOY_HOST "mkdir ~/app"</arg>
+                <runif status="passed" />
+              </exec>
+              <exec command="/bin/bash">
+                <arg>-c</arg>
+                <arg>scp -i $DEPLOY_KEY pkg/*.zip $DEPLOY_USER@$DEPLOY_HOST:~/app</arg>
+                <runif status="passed" />
+              </exec>
+              <exec command="/bin/bash">
+                <arg>-c</arg>
+                <arg>ssh -i $DEPLOY_KEY $DEPLOY_USER@$DEPLOY_HOST "cd ~/app; unzip *.zip"</arg>
+                <runif status="passed" />
+              </exec>
+              <exec command="/bin/bash">
+                <arg>-c</arg>
+                <arg>ssh -i $DEPLOY_KEY $DEPLOY_USER@$DEPLOY_HOST "rm ~/app/*.zip"</arg>
+                <runif status="passed" />
+              </exec>
+              <exec command="/bin/bash">
+                <arg>-c</arg>
+                <arg>ssh -i $DEPLOY_KEY $DEPLOY_USER@$DEPLOY_HOST "whoami"</arg>
+                <runif status="passed" />
+              </exec>
+            </tasks>
+          </job>
+        </jobs>
+      </stage>
+      <stage name="integrationStage" fetchMaterials="false" cleanWorkingDir="true">
+        <jobs>
+          <job name="integrationJob">
+            <tasks>
+              <fetchartifact pipeline="Build" stage="npm" job="package" srcdir="dist">
+                <runif status="passed" />
+              </fetchartifact>
+              <exec command="unzip" workingdir="dist">
+                <arg>*.zip</arg>
+                <runif status="passed" />
+              </exec>
+              <exec command="find" workingdir="dist">
+                <arg>.</arg>
+                <runif status="passed" />
+              </exec>
+              <exec command="/bin/bash" workingdir="dist">
+                <arg>-c</arg>
+                <arg>LAUNCH_URL=http://$DEPLOY_HOST npm run e2e</arg>
+                <runif status="passed" />
+              </exec>
+            </tasks>
+          </job>
+        </jobs>
+      </stage>
+    </pipeline>
+  </pipelines>
+  <environments>
+    <environment name="Dev">
+      <environmentvariables>
+        <variable name="DEPLOY_HOST">
+          <value>{{node_dev_server.ec2_private_ip_address}}</value>
+        </variable>
+        <variable name="DEPLOY_KEY">
+          <value>/var/go/.ssh/goagent_rsa</value>
+        </variable>
+        <variable name="DEPLOY_USER">
+          <value>admin</value>
+        </variable>
+      </environmentvariables>
+      <agents>
+      {% for host in groups[gocd_agent_group] %}
+        <physical uuid="{{hostvars[host].ec2_id}}" />
+      {% endfor %}
+      </agents>
+      <pipelines>
+        <pipeline name="Build" />
+        <pipeline name="DeployToDev" />
+      </pipelines>
+    </environment>
+  </environments>
+  <agents>
+  {% for host in groups[gocd_agent_group] %}
+    <agent hostname="{{hostvars[host].ec2_ip_address}}" ipaddress="{{hostvars[host].ec2_private_ip_address}}" uuid="{{hostvars[host].ec2_id}}" />
+  {% endfor %}
+  </agents>
 </cruise>

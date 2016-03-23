@@ -46,9 +46,15 @@
   template: src=default.j2 dest=/etc/default/go-server owner=go group=go mode=0644
   notify: Restart GoCD server
 
-#- name: Configure cruise-config.xml
-#  template: src=cruise-config.xml.j2 dest=/etc/go/cruise-config.xml owner=go group=go mode=0644
-#  notify: Restart GoCD server
+- debug: var=gocd_max_mem
+
+- name: Configure SERVER_MAX_MEM environment variable
+  lineinfile: dest=/etc/default/go-server regexp="^export SERVER_MAX_MEM" line="export SERVER_MAX_MEM={{gocd_max_mem}}" state=present
+  notify: Restart GoCD server
+
+- name: Configure cruise-config.xml
+  template: src=cruise-config.xml.j2 dest=/etc/go/cruise-config.xml owner=go group=go mode=0644
+  notify: Restart GoCD server
 
 - name: Enable go-server service at boot
   service: name=go-server enabled=yes

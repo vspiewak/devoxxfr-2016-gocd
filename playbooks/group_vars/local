@@ -10,7 +10,7 @@ amazon:
     haproxy:
       ami: ami-116d857a
       type: t2.micro
-      count: 1
+      count: 0
       role: haproxy
       security_group:
         rules:
@@ -18,28 +18,31 @@ amazon:
           - { proto: tcp, from_port: 80, to_port: 80, cidr_ip: 0.0.0.0/0 }
     gocd_server:
       ami: ami-116d857a
-      type: t2.micro
+      type: t2.medium
       count: 1
       role: gocd
       security_group:
         rules:
           - { proto: tcp, from_port: 22, to_port: 22, cidr_ip: 0.0.0.0/0 }
+          - { proto: tcp, from_port: 3000, to_port: 3000, cidr_ip: 0.0.0.0/0 }
           - { proto: tcp, from_port: 8153, to_port: 8153, cidr_ip: 0.0.0.0/0 }
           - { proto: tcp, from_port: 8154, to_port: 8154, cidr_ip: 0.0.0.0/0 }
     gocd_agent:
       ami: ami-116d857a
-      type: t2.micro
-      count: 1
+      type: t2.small
+      count: 2
       role: gocd
       security_group:
         rules:
           - { proto: tcp, from_port: 22, to_port: 22, cidr_ip: 0.0.0.0/0 }
+          - { proto: tcp, from_port: 80, to_port: 80, cidr_ip: 0.0.0.0/0 }
+          - { proto: tcp, from_port: 443, to_port: 443, cidr_ip: 0.0.0.0/0 }
           - { proto: tcp, from_port: 8153, to_port: 8153, cidr_ip: 0.0.0.0/0 }
           - { proto: tcp, from_port: 8154, to_port: 8154, cidr_ip: 0.0.0.0/0 }
     hubot:
       ami: ami-116d857a
       type: t2.micro
-      count: 1
+      count: 0
       role: hubot
       security_group:
         rules:

@@ -6,3 +6,5 @@
     - common
     - java
     - gocd-server
+    - nvm
+    - burstah

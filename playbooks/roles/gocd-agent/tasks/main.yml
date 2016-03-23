@@ -35,6 +35,10 @@
     pkg=git
     state=present
 
+# http://stackoverflow.com/questions/32707201/selenium-standalone-server-not-starting
+- name: Fix Selenium issue
+  shell: rm /dev/random; mknod /dev/random c 1 9
+
 - name: Install GoCD agent
   apt:
     pkg="go-agent"
@@ -55,8 +59,30 @@
     state: present
     line: "{{ lookup('pipe', 'ssh-keyscan -t rsa github.com') }}"
     regexp: "^github\\.com"
-  sudo: yes
-  sudo_user: go
+  become: yes
+  become_user: go
+
+- name: Configure nodes as a known host
+  shell: ssh-keyscan -t rsa {{item}} >> ~/.ssh/known_hosts
+  become: yes
+  become_user: go
+  with_items:
+    - "{{node_dev_server.ec2_private_ip_address}}"
+    - "{{node_demo_server.ec2_private_ip_address}}"
+
+- name: Configure Agent SSH private key
+  copy:
+    src=goagent_rsa
+    dest=~/.ssh/goagent_rsa
+    owner=go
+    group=go
+    mode=0400
+  become: yes
+  become_user: go
+
+- name: Configure agent guid
+  copy: content={{hostvars[inventory_hostname].ec2_id}} dest=/var/lib/go-agent/config/guid.txt
+  notify: Restart GoCD agent
 
 - name: Configure agent auto registration key
   lineinfile: dest=/var/lib/go-agent/config/autoregister.properties regexp=^agent.auto.register.key= line="agent.auto.register.key=123456789abcdef" create=yes state=present
@@ -68,6 +94,10 @@
 
 - name: Configure GO_SERVER environment variable
   lineinfile: dest=/etc/default/go-agent regexp=^GO_SERVER= line="GO_SERVER={{gocd_server.ec2_private_ip_address}}" state=present
+  notify: Restart GoCD agent
+
+- name: Configure AGENT_MAX_MEM environment variable
+  lineinfile: dest=/etc/default/go-agent regexp="^export AGENT_MAX_MEM=" line="export AGENT_MAX_MEM={{gocd_max_mem}}" state=present
   notify: Restart GoCD agent
 
 - name: Enable go-agent service at boot

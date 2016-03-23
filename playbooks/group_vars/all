@@ -13,6 +13,14 @@ timezone: "Europe/Paris"
 gocd_server_group: "{{client}}_{{env}}_gocd_server"
 gocd_server: "{{ hostvars[groups[gocd_server_group][0]] }}"
 
+gocd_agent_group: "{{client}}_{{env}}_gocd_agent"
+
+node_dev_group: "{{client}}_{{env}}_node_dev"
+node_dev_server: "{{ hostvars[groups[node_dev_group][0]] }}"
+
+node_demo_group: "{{client}}_{{env}}_node_demo"
+node_demo_server: "{{ hostvars[groups[node_demo_group][0]] }}"
+
 nvm:
   user: go
   group: go
