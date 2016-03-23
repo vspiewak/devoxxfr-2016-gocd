@@ -42,8 +42,10 @@ frontend public
   mode http
 
   acl gocd_acl hdr_beg(host) -i gocd
+  acl tray_acl hdr_beg(host) -i tray
 
   use_backend gocd_backend if gocd_acl
+	use_backend tray_backend if tray_acl
 
 
 backend gocd_backend
@@ -53,3 +55,12 @@ backend gocd_backend
   option forwardfor except 127.0.0.1
   http-request add-header X-Forwarded-Proto https if { ssl_fc }
   server gocd_server1 {{gocd_server.ec2_private_ip_address}}:8153 maxconn 5000
+
+
+backend tray_backend
+
+  mode http
+  option httpchk
+  option forwardfor except 127.0.0.1
+  http-request add-header X-Forwarded-Proto https if { ssl_fc }
+  server tray_server1 {{gocd_server.ec2_private_ip_address}}:3000 maxconn 5000	
