@@ -1,0 +1,7 @@
+---
+# handlers
+
+- name: Restart Burstah server
+  service:
+    name=burstah
+    state=restarted

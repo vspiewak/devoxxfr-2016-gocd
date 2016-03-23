@@ -1,0 +1,32 @@
+- name: Create Burstah group
+  group: name="{{burstah.group}}" state=present
+
+- name: Create Burstah user
+  user: name="{{burstah.user}}" group="{{burstah.group}}"
+
+- name: Checkout Burstah repository
+  git: repo="https://github.com/lplotni/burstah.git" dest=/opt/burstah clone=yes update=yes force=yes
+  notify: Restart Burstah server
+
+- name: 'Set file permissions on burstah'
+  file: path=/opt/burstah owner="{{burstah.user}}" group="{{burstah.group}}" state=touch state=directory mode=0755
+
+- name: Install Systemd
+  apt:
+    pkg="systemd"
+    state=present
+
+- name: Install Burstah
+  shell: sudo -iu {{ burstah.user }} npm install /opt/burstah
+  notify: Restart Burstah server
+
+- name: Configure Burstah
+  template: src=config.js.j2 dest=/opt/burstah/config.js owner="{{burstah.user}}" group="{{burstah.group}}" mode=0744
+  notify: Restart Burstah server
+
+- name: Configure Burstah service
+  template: src=burstah.service.j2 dest=/etc/systemd/system/burstah.service owner=root group=root mode=0744
+  notify: Restart Burstah server
+
+- name: Enable hubot service at boot
+  service: name=burstah enabled=yes

@@ -1,0 +1,20 @@
+; Hubot systemd service unit file
+; Place in e.g. `/etc/systemd/system/burstah.service`, then `systemctl daemon-reload` and `service burstah start`.
+
+[Unit]
+Description=Burstah
+Requires=network.target
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/burstah
+User={{burstah.user}}
+
+Restart=always
+RestartSec=10
+
+ExecStart=/bin/bash -c ". ~/.nvm/nvm.sh; npm run start"
+
+[Install]
+WantedBy=multi-user.target
