@@ -17,7 +17,11 @@
     state=present
 
 - name: Install Burstah
-  shell: sudo -iu {{ burstah.user }} npm install /opt/burstah
+  shell: bash -lc "npm install"
+  args:
+    chdir: /opt/burstah
+  become: true
+  become_user: "{{burstah.user}}"
   notify: Restart Burstah server
 
 - name: Configure Burstah
@@ -28,5 +32,5 @@
   template: src=burstah.service.j2 dest=/etc/systemd/system/burstah.service owner=root group=root mode=0744
   notify: Restart Burstah server
 
-- name: Enable hubot service at boot
+- name: Enable Burstah service at boot
   service: name=burstah enabled=yes
