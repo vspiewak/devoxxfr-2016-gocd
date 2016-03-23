@@ -1,0 +1,11 @@
+- name: Install unzip
+  apt:
+    pkg=unzip
+    state=present
+
+- name: Configure Agent SSH public key
+  authorized_key: user=admin key="{{ item }}"
+  with_file:
+    - roles/node/files/goagent_rsa.pub
+  become: yes
+  become_user: admin
