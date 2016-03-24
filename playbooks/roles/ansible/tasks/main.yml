@@ -1,0 +1,4 @@
+- name: Install ansible
+  apt:
+    pkg=ansible
+    state=present

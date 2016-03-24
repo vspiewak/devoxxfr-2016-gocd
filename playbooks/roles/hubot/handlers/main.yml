@@ -5,3 +5,6 @@
   service:
     name=hubot
     state=restarted
+
+- name: Reload Hubot daemon
+  shell: systemctl daemon-reload

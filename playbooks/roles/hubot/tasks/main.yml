@@ -20,9 +20,26 @@
   shell: sudo -iu {{ hubot.user }} npm install /opt/hubot
   notify: Restart Hubot server
 
+- name: Create inventory directory
+  file: path=/opt/hubot/inventory state=directory owner="{{hubot.user}}" group="{{hubot.group}}" mode=0755
+
+- name: Configure inventory/ec2.ini
+  copy: src=inventory/ec2.ini dest=/opt/hubot/inventory/ec2.ini owner="{{hubot.user}}" group="{{hubot.group}}" mode=655
+
+- name: Configure inventory/ec2.py
+  copy: src=inventory/ec2.py dest=/opt/hubot/inventory/ec2.py owner="{{hubot.user}}" group="{{hubot.group}}" mode=755
+
+- name: Configure PEM file
+  copy: src="{{lookup('env','HUBOT_PEM_PATH')}}" dest="{{ lookup('env','HUBOT_ANSIBLE_PRIVATE_KEY') }}" owner="{{hubot.user}}" group="{{hubot.group}}"
+
+- name: Protect PEM file
+  shell: bash -lc "chmod 400 {{ lookup('env','HUBOT_ANSIBLE_PRIVATE_KEY') }}"
+
 - name: Configure hubot service
   template: src=hubot.service.j2 dest=/etc/systemd/system/hubot.service owner=root group=root mode=0744
-  notify: Restart Hubot server
+  notify:
+    - Reload Hubot daemon
+    - Restart Hubot server
 
 - name: Enable hubot service at boot
   service: name=hubot enabled=yes

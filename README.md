@@ -56,6 +56,22 @@ Configure hubot
 
     export HUBOT_SLACK_TOKEN=<xoxb-*******-*********************>
 
+    export HUBOT_GOCI_CCTRAY_URL=http://gocd.devoxx.dailybrain.fr/go/cctray.xml
+
+    export HUBOT_ANSIBLE_INVENTORY_INI=/opt/hubot/inventory/ec2.ini
+    export HUBOT_ANSIBLE_INVENTORY_FILE=/opt/hubot/inventory/ec2.py
+    export HUBOT_ANSIBLE_PRIVATE_KEY=/opt/hubot/<pem_file_name>.pem
+    export HUBOT_ANSIBLE_PREFIX_HOSTS="devoxx_tia_"
+    export HUBOT_ANSIBLE_REMOTE_USER="admin"
+
+    export HUBOT_PEM_PATH=~/.ssh/<pem_file_name>.pem
+    export HUBOT_ANSIBLE_HOST_KEY_CHECKING=False
+    export HUBOT_EC2_REGION=us-east-1
+    export HUBOT_AWS_ACCESS_KEY=<hubot_aws_access_key>
+    export HUBOT_AWS_SECRET_KEY=<hubot_aws_secret_key>
+    export HUBOT_AWS_ACCESS_KEY_ID=$HUBOT_AWS_ACCESS_KEY
+    export HUBOT_AWS_SECRET_ACCESS_KEY=$HUBOT_AWS_SECRET_KEY
+
 
 Create EC2 instances
 --------------------
