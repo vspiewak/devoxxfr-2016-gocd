@@ -15,6 +15,9 @@ gocd_server: "{{ hostvars[groups[gocd_server_group][0]] }}"
 
 gocd_agent_group: "{{client}}_{{env}}_gocd_agent"
 
+hubot_group: "{{client}}_{{env}}_hubot"
+hubot_server: "{{ hostvars[groups[hubot_group][0]] }}"
+
 node_dev_group: "{{client}}_{{env}}_node_dev"
 node_dev_server: "{{ hostvars[groups[node_dev_group][0]] }}"
 

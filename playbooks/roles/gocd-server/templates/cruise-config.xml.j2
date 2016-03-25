@@ -78,7 +78,7 @@
               </exec>
               <exec command="/bin/bash">
                 <arg>-c</arg>
-                <arg>ssh -i $DEPLOY_KEY $DEPLOY_USER@$DEPLOY_HOST "cd ~/app; unzip *.zip"</arg>
+                <arg>ssh -i $DEPLOY_KEY $DEPLOY_USER@$DEPLOY_HOST "cd ~/app; unzip -qq *.zip"</arg>
                 <runif status="passed" />
               </exec>
               <exec command="/bin/bash">
@@ -103,11 +103,8 @@
                 <runif status="passed" />
               </fetchartifact>
               <exec command="unzip" workingdir="dist">
+                <arg>-qq</arg>
                 <arg>*.zip</arg>
-                <runif status="passed" />
-              </exec>
-              <exec command="find" workingdir="dist">
-                <arg>.</arg>
                 <runif status="passed" />
               </exec>
               <exec command="/bin/bash" workingdir="dist">
@@ -116,6 +113,235 @@
                 <runif status="passed" />
               </exec>
             </tasks>
+          </job>
+        </jobs>
+      </stage>
+    </pipeline>
+    <pipeline name="DevReview" labeltemplate="${boilerplate[:7]}" isLocked="false">
+      <trackingtool link="https://github.com/vspiewak/react-redux-boilerplate/issues/${ID}" regex="##(\d+)" />
+      <materials>
+        <pipeline pipelineName="DeployToDev" stageName="integrationStage" materialName="boilerplate" />
+      </materials>
+      <stage name="notify" fetchMaterials="false">
+        <jobs>
+          <job name="notify">
+            <tasks>
+              <exec command="/bin/bash">
+                <arg>-c</arg>
+                <arg>curl -X POST http://{{hubot_server.ec2_private_ip_address}}:8080/hubot/say -d message="You can &lt;https://github.com/vspiewak/react-redux-boilerplate/commit/$GO_PIPELINE_LABEL|review this commit&gt; and then &lt;http://{{gocd_server.ec2_ip_address}}:8153/go/pipelines/$GO_PIPELINE_NAME/$GO_PIPELINE_COUNTER/$GO_STAGE_NAME/$GO_STAGE_COUNTER|deploy it&gt; to the next environnement" -d room='##dev-team' -d color='##87579B' -d author_name='GoCD' -d author_link="http://{{gocd_server.ec2_ip_address}}:8153/go/pipelines/$GO_PIPELINE_NAME/$GO_PIPELINE_COUNTER/$GO_STAGE_NAME/$GO_STAGE_COUNTER" -d title="Version $GO_PIPELINE_LABEL deployed on $GO_ENVIRONMENT_NAME" -d title_link='http://{{node_dev_server.ec2_ip_address}}' -d thumb_url='https://raw.githubusercontent.com/vspiewak/nono/master/assets/gocd_thumb_url.gif'</arg>
+                <runif status="passed" />
+              </exec>
+            </tasks>
+          </job>
+        </jobs>
+      </stage>
+      <stage name="validate">
+        <approval type="manual" />
+        <jobs>
+          <job name="validate">
+            <tasks>
+              <exec command="echo">
+                <arg>"validated"</arg>
+              </exec>
+            </tasks>
+          </job>
+        </jobs>
+      </stage>
+    </pipeline>
+    <pipeline name="DeployToDemo" labeltemplate="${boilerplate[:7]}" isLocked="false">
+      <trackingtool link="https://github.com/vspiewak/react-redux-boilerplate/issues/${ID}" regex="##(\d+)" />
+      <materials>
+        <pipeline pipelineName="DevReview" stageName="validate" materialName="boilerplate" />
+      </materials>
+      <stage name="deployStage" fetchMaterials="false" cleanWorkingDir="true">
+        <jobs>
+          <job name="deployJob">
+            <tasks>
+              <fetchartifact pipeline="Build/DeployToDev/DevReview" stage="npm" job="package" srcdir="pkg">
+                <runif status="passed" />
+              </fetchartifact>
+              <exec command="/bin/bash">
+                <arg>-c</arg>
+                <arg>ssh -i $DEPLOY_KEY $DEPLOY_USER@$DEPLOY_HOST "rm -rf ~/app"</arg>
+                <runif status="passed" />
+              </exec>
+              <exec command="/bin/bash">
+                <arg>-c</arg>
+                <arg>ssh -i $DEPLOY_KEY $DEPLOY_USER@$DEPLOY_HOST "mkdir ~/app"</arg>
+                <runif status="passed" />
+              </exec>
+              <exec command="/bin/bash">
+                <arg>-c</arg>
+                <arg>scp -i $DEPLOY_KEY pkg/*.zip $DEPLOY_USER@$DEPLOY_HOST:~/app</arg>
+                <runif status="passed" />
+              </exec>
+              <exec command="/bin/bash">
+                <arg>-c</arg>
+                <arg>ssh -i $DEPLOY_KEY $DEPLOY_USER@$DEPLOY_HOST "cd ~/app; unzip -qq *.zip"</arg>
+                <runif status="passed" />
+              </exec>
+              <exec command="/bin/bash">
+                <arg>-c</arg>
+                <arg>ssh -i $DEPLOY_KEY $DEPLOY_USER@$DEPLOY_HOST "rm ~/app/*.zip"</arg>
+                <runif status="passed" />
+              </exec>
+              <exec command="/bin/bash">
+                <arg>-c</arg>
+                <arg>ssh -i $DEPLOY_KEY $DEPLOY_USER@$DEPLOY_HOST "whoami"</arg>
+                <runif status="passed" />
+              </exec>
+            </tasks>
+          </job>
+        </jobs>
+      </stage>
+      <stage name="integrationStage" fetchMaterials="false" cleanWorkingDir="true">
+        <jobs>
+          <job name="integrationJob">
+            <tasks>
+              <fetchartifact pipeline="Build/DeployToDev/DevReview" stage="npm" job="package" srcdir="dist">
+                <runif status="passed" />
+              </fetchartifact>
+              <exec command="unzip" workingdir="dist">
+                <arg>-qq</arg>
+                <arg>*.zip</arg>
+                <runif status="passed" />
+              </exec>
+              <exec command="/bin/bash" workingdir="dist">
+                <arg>-c</arg>
+                <arg>LAUNCH_URL=http://$DEPLOY_HOST npm run e2e</arg>
+                <runif status="passed" />
+              </exec>
+            </tasks>
+          </job>
+        </jobs>
+      </stage>
+    </pipeline>
+    <pipeline name="POReview" labeltemplate="${boilerplate[:7]}" isLocked="false">
+      <trackingtool link="https://github.com/vspiewak/react-redux-boilerplate/issues/${ID}" regex="##(\d+)" />
+      <materials>
+        <pipeline pipelineName="DeployToDemo" stageName="integrationStage" materialName="boilerplate" />
+      </materials>
+      <stage name="notify" fetchMaterials="false">
+        <jobs>
+          <job name="notify">
+            <tasks>
+              <exec command="/bin/bash">
+                <arg>-c</arg>
+                <arg>curl -X POST http://{{hubot_server.ec2_private_ip_address}}:8080/hubot/say -d message="You can &lt;https://github.com/vspiewak/react-redux-boilerplate/commit/$GO_PIPELINE_LABEL|review this commit&gt; and then &lt;http://{{gocd_server.ec2_ip_address}}:8153/go/pipelines/$GO_PIPELINE_NAME/$GO_PIPELINE_COUNTER/$GO_STAGE_NAME/$GO_STAGE_COUNTER|deploy it&gt; to the next environnement" -d room='##dev-team' -d color='##87579B' -d author_name='GoCD' -d author_link="http://{{gocd_server.ec2_ip_address}}:8153/go/pipelines/$GO_PIPELINE_NAME/$GO_PIPELINE_COUNTER/$GO_STAGE_NAME/$GO_STAGE_COUNTER" -d title="Version $GO_PIPELINE_LABEL deployed on $GO_ENVIRONMENT_NAME" -d title_link='http://{{node_demo_server.ec2_ip_address}}' -d thumb_url='https://raw.githubusercontent.com/vspiewak/nono/master/assets/gocd_thumb_url.gif'</arg>
+                <runif status="passed" />
+              </exec>
+            </tasks>
+          </job>
+        </jobs>
+      </stage>
+      <stage name="validate">
+        <approval type="manual" />
+        <jobs>
+          <job name="validate">
+            <tasks>
+              <exec command="echo">
+                <arg>"validated"</arg>
+              </exec>
+            </tasks>
+          </job>
+        </jobs>
+      </stage>
+    </pipeline>
+    <pipeline name="Performances" labeltemplate="${boilerplate[:7]}" isLocked="false">
+      <trackingtool link="https://github.com/vspiewak/react-redux-boilerplate/issues/${ID}" regex="##(\d+)" />
+      <materials>
+        <pipeline pipelineName="DeployToDemo" stageName="integrationStage" materialName="boilerplate" />
+      </materials>
+      <stage name="sitespeed.io" fetchMaterials="false" cleanWorkingDir="true">
+        <jobs>
+          <job name="sitespeed.io-desktop">
+            <tasks>
+              <fetchartifact pipeline="Build/DeployToDev/DevReview/DeployToDemo" stage="npm" job="package" srcdir="dist">
+                <runif status="passed" />
+              </fetchartifact>
+              <exec command="unzip" workingdir="dist">
+                <arg>-qq</arg>
+                <arg>*.zip</arg>
+                <runif status="passed" />
+              </exec>
+              <exec command="npm" workingdir="dist">
+                <arg>run</arg>
+                <arg>sitespeed:desktop</arg>
+                <arg>--</arg>
+                <arg>-u</arg>
+                <arg>http://{{node_demo_server.ec2_ip_address}}</arg>
+                <runif status="passed" />
+              </exec>
+            </tasks>
+            <tabs>
+              <tab name="Summary" path="sitespeed.io-desktop/index.html" />
+              <tab name="Errors" path="sitespeed.io-desktop/errors.html" />
+              <tab name="Screenshot" path="sitespeed.io-desktop/screenshots.html" />
+            </tabs>
+            <artifacts>
+              <test src="dist/sitespeed-result/sitespeed.io-desktop" />
+            </artifacts>
+          </job>
+          <job name="sitespeed.io-mobile">
+            <tasks>
+              <fetchartifact pipeline="Build/DeployToDev/DevReview/DeployToDemo" stage="npm" job="package" srcdir="dist">
+                <runif status="passed" />
+              </fetchartifact>
+              <exec command="unzip" workingdir="dist">
+                <arg>-qq</arg>
+                <arg>*.zip</arg>
+                <runif status="passed" />
+              </exec>
+              <exec command="npm" workingdir="dist">
+                <arg>run</arg>
+                <arg>sitespeed:mobile</arg>
+                <arg>--</arg>
+                <arg>-u</arg>
+                <arg>http://{{node_demo_server.ec2_ip_address}}</arg>
+                <runif status="passed" />
+              </exec>
+            </tasks>
+            <tabs>
+              <tab name="Summary" path="sitespeed.io-mobile/index.html" />
+              <tab name="Errors" path="sitespeed.io-mobile/errors.html" />
+              <tab name="Screenshot" path="sitespeed.io-mobile/screenshots.html" />
+            </tabs>
+            <artifacts>
+              <test src="dist/sitespeed-result/sitespeed.io-mobile" />
+            </artifacts>
+          </job>
+        </jobs>
+      </stage>
+    </pipeline>
+    <pipeline name="Coverage" labeltemplate="${boilerplate[:7]}" isLocked="false">
+      <trackingtool link="https://github.com/vspiewak/react-redux-boilerplate/issues/${ID}" regex="##(\d+)" />
+      <materials>
+        <pipeline pipelineName="DeployToDemo" stageName="integrationStage" materialName="boilerplate" />
+      </materials>
+      <stage name="code-coverage" fetchMaterials="false" cleanWorkingDir="true">
+        <jobs>
+          <job name="code-coverage">
+            <tasks>
+              <fetchartifact pipeline="Build/DeployToDev/DevReview/DeployToDemo" stage="npm" job="package" srcdir="dist">
+                <runif status="passed" />
+              </fetchartifact>
+              <exec command="unzip" workingdir="dist">
+                <arg>-qq</arg>
+                <arg>*.zip</arg>
+                <runif status="passed" />
+              </exec>
+              <exec command="npm" workingdir="dist">
+                <arg>run</arg>
+                <arg>plato</arg>
+                <runif status="passed" />
+              </exec>
+            </tasks>
+            <tabs>
+              <tab name="Plato" path="reports/index.html" />
+            </tabs>
+            <artifacts>
+              <test src="dist/reports" />
+            </artifacts>
           </job>
         </jobs>
       </stage>
@@ -142,6 +368,31 @@
       <pipelines>
         <pipeline name="Build" />
         <pipeline name="DeployToDev" />
+        <pipeline name="DevReview" />
+      </pipelines>
+    </environment>
+    <environment name="Demo">
+      <environmentvariables>
+        <variable name="DEPLOY_HOST">
+          <value>{{node_demo_server.ec2_private_ip_address}}</value>
+        </variable>
+        <variable name="DEPLOY_KEY">
+          <value>/var/go/.ssh/goagent_rsa</value>
+        </variable>
+        <variable name="DEPLOY_USER">
+          <value>admin</value>
+        </variable>
+      </environmentvariables>
+      <agents>
+      {% for host in groups[gocd_agent_group] %}
+        <physical uuid="{{hostvars[host].ec2_id}}" />
+      {% endfor %}
+      </agents>
+      <pipelines>
+        <pipeline name="Coverage" />
+        <pipeline name="DeployToDemo" />
+        <pipeline name="Performances" />
+        <pipeline name="POReview" />
       </pipelines>
     </environment>
   </environments>
