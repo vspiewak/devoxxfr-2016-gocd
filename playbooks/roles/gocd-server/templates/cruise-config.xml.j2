@@ -54,9 +54,9 @@
       <materials>
         <pipeline pipelineName="Build" stageName="npm" materialName="boilerplate" />
       </materials>
-      <stage name="deployStage" fetchMaterials="false" cleanWorkingDir="true">
+      <stage name="deploy" fetchMaterials="false" cleanWorkingDir="true">
         <jobs>
-          <job name="deployJob">
+          <job name="deploy">
             <tasks>
               <fetchartifact pipeline="Build" stage="npm" job="package" srcdir="pkg">
                 <runif status="passed" />
@@ -170,9 +170,9 @@
       <materials>
         <pipeline pipelineName="DevReview" stageName="validate" materialName="boilerplate" />
       </materials>
-      <stage name="deployStage" fetchMaterials="false" cleanWorkingDir="true">
+      <stage name="deploy" fetchMaterials="false" cleanWorkingDir="true">
         <jobs>
-          <job name="deployJob">
+          <job name="deploy">
             <tasks>
               <fetchartifact pipeline="Build/DeployToDev/DevReview" stage="npm" job="package" srcdir="pkg">
                 <runif status="passed" />
