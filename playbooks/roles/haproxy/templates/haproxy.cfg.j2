@@ -24,9 +24,9 @@ defaults
 	mode	http
 	option	httplog
 	option	dontlognull
-  timeout connect 5000
-  timeout client  50000
-  timeout server  50000
+	timeout connect 5000
+	timeout client  50000
+	timeout server  50000
 	errorfile 400 /etc/haproxy/errors/400.http
 	errorfile 403 /etc/haproxy/errors/403.http
 	errorfile 408 /etc/haproxy/errors/408.http
@@ -43,9 +43,15 @@ frontend public
 
   acl gocd_acl hdr_beg(host) -i gocd
   acl tray_acl hdr_beg(host) -i tray
+  acl dev_acl hdr_beg(host) -i dev
+  acl demo_acl hdr_beg(host) -i demo
+  acl hubot_acl hdr_beg(host) -i hubot
 
   use_backend gocd_backend if gocd_acl
-	use_backend tray_backend if tray_acl
+  use_backend tray_backend if tray_acl
+  use_backend dev_backend if dev_acl
+  use_backend demo_backend if demo_acl
+  use_backend hubot_backend if hubot_acl
 
 
 backend gocd_backend
@@ -63,4 +69,31 @@ backend tray_backend
   option httpchk
   option forwardfor except 127.0.0.1
   http-request add-header X-Forwarded-Proto https if { ssl_fc }
-  server tray_server1 {{gocd_server.ec2_private_ip_address}}:3000 maxconn 5000	
+  server tray_server1 {{gocd_server.ec2_private_ip_address}}:3000 maxconn 5000
+
+
+backend dev_backend
+
+  mode http
+  option httpchk
+  option forwardfor except 127.0.0.1
+  http-request add-header X-Forwarded-Proto https if { ssl_fc }
+  server node_dev_server1 {{node_dev_server.ec2_private_ip_address}} maxconn 5000
+
+
+backend demo_backend
+
+  mode http
+  option httpchk
+  option forwardfor except 127.0.0.1
+  http-request add-header X-Forwarded-Proto https if { ssl_fc }
+  server node_demo_server1 {{node_demo_server.ec2_private_ip_address}} maxconn 5000
+
+
+backend hubot_backend
+
+  mode http
+  option httpchk
+  option forwardfor except 127.0.0.1
+  http-request add-header X-Forwarded-Proto https if { ssl_fc }
+  server hubot_server1 {{hubot_server.ec2_private_ip_address}}:8080 maxconn 5000
