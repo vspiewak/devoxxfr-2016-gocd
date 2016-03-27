@@ -39,6 +39,18 @@
 - name: Configure vspiewak user (X@2rAswuda)
   lineinfile: dest=/var/go/passwd regexp='^vspiewak' line='vspiewak:{SHA}vi3iBT8hegvho/8h+Y92EK9f4Qw=' create=yes state=present owner=go group=go mode=0644
 
+- name: Configure one-dev user (X@2rAswuda)
+  lineinfile: dest=/var/go/passwd regexp='^one-dev' line='one-dev:{SHA}vi3iBT8hegvho/8h+Y92EK9f4Qw=' create=yes state=present owner=go group=go mode=0644
+
+- name: Configure one-po user (X@2rAswuda)
+  lineinfile: dest=/var/go/passwd regexp='^one-po' line='one-po:{SHA}vi3iBT8hegvho/8h+Y92EK9f4Qw=' create=yes state=present owner=go group=go mode=0644
+
+- name: Configure burstah user (X@2rAswuda)
+  lineinfile: dest=/var/go/passwd regexp='^burstah' line='burstah:{SHA}vi3iBT8hegvho/8h+Y92EK9f4Qw=' create=yes state=present owner=go group=go mode=0644
+
+- name: Configure hubot user (X@2rAswuda)
+  lineinfile: dest=/var/go/passwd regexp='^hubot' line='hubot:{SHA}vi3iBT8hegvho/8h+Y92EK9f4Qw=' create=yes state=present owner=go group=go mode=0644
+
 - name: Configure cipher
   copy: src=cipher dest=/etc/go/cipher owner=go group=go mode=0644
 

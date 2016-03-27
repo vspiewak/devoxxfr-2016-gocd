@@ -18,6 +18,8 @@ hubot:
     - { key: "HUBOT_TWITTER_MENTION_ROOM",        value: "#twitter" }
     - { key: "HUBOT_GOCI_CCTRAY_URL",             value: "{{ lookup('env','HUBOT_GOCI_CCTRAY_URL') }}" }
     - { key: "HUBOT_GOCI_EVENT_NOTIFIER_ROOM",    value: "#dev-team" }
+    - { key: "HUBOT_GOCD_USERNAME",               value: "hubot" }
+    - { key: "HUBOT_GOCD_PASSWORD",               value: "X@2rAswuda" }
     - { key: "HUBOT_ANSIBLE_INVENTORY_INI",       value: "{{ lookup('env','HUBOT_ANSIBLE_INVENTORY_INI') }}" }
     - { key: "HUBOT_ANSIBLE_INVENTORY_FILE",      value: "{{ lookup('env','HUBOT_ANSIBLE_INVENTORY_FILE') }}" }
     - { key: "HUBOT_ANSIBLE_PRIVATE_KEY",         value: "{{ lookup('env','HUBOT_ANSIBLE_PRIVATE_KEY') }}" }

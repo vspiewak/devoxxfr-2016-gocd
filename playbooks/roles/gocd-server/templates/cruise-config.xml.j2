@@ -1,7 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
 <cruise xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="cruise-config.xsd" schemaVersion="77">
-  <server artifactsdir="artifacts" commandRepositoryLocation="default" />
+  <server artifactsdir="artifacts" commandRepositoryLocation="default">
+    <security>
+      <passwordFile path="/var/go/passwd" />
+      <roles>
+        <role name="Developers">
+          <users>
+            <user>one-dev</user>
+          </users>
+        </role>
+        <role name="ProductOwners">
+          <users>
+            <user>one-po</user>
+          </users>
+        </role>
+        <role name="ReadOnlyUsers">
+          <users>
+            <user>burstah</user>
+            <user>hubot</user>
+          </users>
+        </role>
+      </roles>
+      <admins>
+        <user>vspiewak</user>
+      </admins>
+    </security>
+  </server>
   <pipelines group="Boilerplate">
+    <authorization>
+      <view>
+        <role>Developers</role>
+        <role>ProductOwners</role>
+        <role>ReadOnlyUsers</role>
+      </view>
+      <operate>
+        <role>Developers</role>
+        <role>ProductOwners</role>
+      </operate>
+    </authorization>
     <pipeline name="Build" labeltemplate="${boilerplate[:7]}" isLocked="false">
       <trackingtool link="https://github.com/vspiewak/react-redux-boilerplate/issues/${ID}" regex="##(\d+)" />
       <materials>
@@ -345,7 +381,11 @@
         </jobs>
       </stage>
       <stage name="validate">
-        <approval type="manual" />
+        <approval type="manual">
+          <authorization>
+            <role>ProductOwners</role>
+          </authorization>
+        </approval>
         <jobs>
           <job name="validate">
             <tasks>
