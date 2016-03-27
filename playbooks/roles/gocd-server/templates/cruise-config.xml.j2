@@ -423,14 +423,14 @@
         </jobs>
       </stage>
     </pipeline>
-    <pipeline name="Coverage" labeltemplate="${boilerplate[:7]}" isLocked="false">
+    <pipeline name="Analysis" labeltemplate="${boilerplate[:7]}" isLocked="false">
       <trackingtool link="https://github.com/vspiewak/react-redux-boilerplate/issues/${ID}" regex="##(\d+)" />
       <materials>
         <pipeline pipelineName="DeployToDemo" stageName="acceptance-tests" materialName="boilerplate" />
       </materials>
-      <stage name="code-coverage" fetchMaterials="false" cleanWorkingDir="true">
+      <stage name="code-analysis" fetchMaterials="false" cleanWorkingDir="true">
         <jobs>
-          <job name="code-coverage">
+          <job name="code-analysis">
             <tasks>
               <fetchartifact pipeline="Build/DeployToDev/DevReview/DeployToDemo" stage="npm" job="package" srcdir="dist">
                 <runif status="passed" />
@@ -499,7 +499,7 @@
       {% endfor %}
       </agents>
       <pipelines>
-        <pipeline name="Coverage" />
+        <pipeline name="Analysis" />
         <pipeline name="DeployToDemo" />
         <pipeline name="Performances" />
         <pipeline name="POReview" />
