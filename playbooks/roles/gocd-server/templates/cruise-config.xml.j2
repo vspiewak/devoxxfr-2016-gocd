@@ -133,11 +133,49 @@
           </job>
         </jobs>
       </stage>
+      <stage name="acceptance-tests" fetchMaterials="false" cleanWorkingDir="true">
+        <jobs>
+          <job name="acceptance-tests-smoke">
+            <tasks>
+              <fetchartifact pipeline="Build" stage="npm" job="package" srcdir="dist">
+                <runif status="passed" />
+              </fetchartifact>
+              <exec command="unzip" workingdir="dist">
+                <arg>-qq</arg>
+                <arg>*.zip</arg>
+                <runif status="passed" />
+              </exec>
+              <exec command="/bin/bash" workingdir="dist">
+                <arg>-c</arg>
+                <arg>LAUNCH_URL=http://$DEPLOY_HOST npm run bdd -- --group smoke</arg>
+                <runif status="passed" />
+              </exec>
+            </tasks>
+          </job>
+          <job name="acceptance-tests-landing">
+            <tasks>
+              <fetchartifact pipeline="Build" stage="npm" job="package" srcdir="dist">
+                <runif status="passed" />
+              </fetchartifact>
+              <exec command="unzip" workingdir="dist">
+                <arg>-qq</arg>
+                <arg>*.zip</arg>
+                <runif status="passed" />
+              </exec>
+              <exec command="/bin/bash" workingdir="dist">
+                <arg>-c</arg>
+                <arg>LAUNCH_URL=http://$DEPLOY_HOST npm run bdd -- --group landing</arg>
+                <runif status="passed" />
+              </exec>
+            </tasks>
+          </job>
+        </jobs>
+      </stage>
     </pipeline>
     <pipeline name="DevReview" labeltemplate="${boilerplate[:7]}" isLocked="false">
       <trackingtool link="https://github.com/vspiewak/react-redux-boilerplate/issues/${ID}" regex="##(\d+)" />
       <materials>
-        <pipeline pipelineName="DeployToDev" stageName="integration-tests" materialName="boilerplate" />
+        <pipeline pipelineName="DeployToDev" stageName="acceptance-tests" materialName="boilerplate" />
       </materials>
       <stage name="notify" fetchMaterials="false">
         <jobs>
@@ -249,11 +287,49 @@
           </job>
         </jobs>
       </stage>
+      <stage name="acceptance-tests" fetchMaterials="false" cleanWorkingDir="true">
+        <jobs>
+          <job name="acceptance-tests-smoke">
+            <tasks>
+              <fetchartifact pipeline="Build/DeployToDev/DevReview" stage="npm" job="package" srcdir="dist">
+                <runif status="passed" />
+              </fetchartifact>
+              <exec command="unzip" workingdir="dist">
+                <arg>-qq</arg>
+                <arg>*.zip</arg>
+                <runif status="passed" />
+              </exec>
+              <exec command="/bin/bash" workingdir="dist">
+                <arg>-c</arg>
+                <arg>LAUNCH_URL=http://$DEPLOY_HOST npm run bdd -- --group smoke</arg>
+                <runif status="passed" />
+              </exec>
+            </tasks>
+          </job>
+          <job name="acceptance-tests-landing">
+            <tasks>
+              <fetchartifact pipeline="Build/DeployToDev/DevReview" stage="npm" job="package" srcdir="dist">
+                <runif status="passed" />
+              </fetchartifact>
+              <exec command="unzip" workingdir="dist">
+                <arg>-qq</arg>
+                <arg>*.zip</arg>
+                <runif status="passed" />
+              </exec>
+              <exec command="/bin/bash" workingdir="dist">
+                <arg>-c</arg>
+                <arg>LAUNCH_URL=http://$DEPLOY_HOST npm run bdd -- --group landing</arg>
+                <runif status="passed" />
+              </exec>
+            </tasks>
+          </job>
+        </jobs>
+      </stage>
     </pipeline>
     <pipeline name="POReview" labeltemplate="${boilerplate[:7]}" isLocked="false">
       <trackingtool link="https://github.com/vspiewak/react-redux-boilerplate/issues/${ID}" regex="##(\d+)" />
       <materials>
-        <pipeline pipelineName="DeployToDemo" stageName="integration-tests" materialName="boilerplate" />
+        <pipeline pipelineName="DeployToDemo" stageName="acceptance-tests" materialName="boilerplate" />
       </materials>
       <stage name="notify" fetchMaterials="false">
         <jobs>
@@ -284,7 +360,7 @@
     <pipeline name="Performances" labeltemplate="${boilerplate[:7]}" isLocked="false">
       <trackingtool link="https://github.com/vspiewak/react-redux-boilerplate/issues/${ID}" regex="##(\d+)" />
       <materials>
-        <pipeline pipelineName="DeployToDemo" stageName="integration-tests" materialName="boilerplate" />
+        <pipeline pipelineName="DeployToDemo" stageName="acceptance-tests" materialName="boilerplate" />
       </materials>
       <stage name="sitespeed.io" fetchMaterials="false" cleanWorkingDir="true">
         <jobs>
@@ -350,7 +426,7 @@
     <pipeline name="Coverage" labeltemplate="${boilerplate[:7]}" isLocked="false">
       <trackingtool link="https://github.com/vspiewak/react-redux-boilerplate/issues/${ID}" regex="##(\d+)" />
       <materials>
-        <pipeline pipelineName="DeployToDemo" stageName="integration-tests" materialName="boilerplate" />
+        <pipeline pipelineName="DeployToDemo" stageName="acceptance-tests" materialName="boilerplate" />
       </materials>
       <stage name="code-coverage" fetchMaterials="false" cleanWorkingDir="true">
         <jobs>
