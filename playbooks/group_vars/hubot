@@ -14,10 +14,10 @@ hubot:
     - { key: "HUBOT_TWITTER_CONSUMER_SECRET",     value: "{{ lookup('env','HUBOT_TWITTER_CONSUMER_SECRET') }}" }
     - { key: "HUBOT_TWITTER_ACCESS_TOKEN_KEY",    value: "{{ lookup('env','HUBOT_TWITTER_ACCESS_TOKEN_KEY') }}" }
     - { key: "HUBOT_TWITTER_ACCESS_TOKEN_SECRET", value: "{{ lookup('env','HUBOT_TWITTER_ACCESS_TOKEN_SECRET') }}" }
-    - { key: "HUBOT_TWITTER_MENTION_QUERY",       value: "devoxx" }
+    - { key: "HUBOT_TWITTER_MENTION_QUERY",       value: "android" }
     - { key: "HUBOT_TWITTER_MENTION_ROOM",        value: "#twitter" }
-    - { key: "HUBOT_GITHUB_EVENT_NOTIFIER_ROOM",  value: "#dev-team" }
     - { key: "HUBOT_GOCI_CCTRAY_URL",             value: "{{ lookup('env','HUBOT_GOCI_CCTRAY_URL') }}" }
+    - { key: "HUBOT_GOCI_EVENT_NOTIFIER_ROOM",    value: "#dev-team" }
     - { key: "HUBOT_ANSIBLE_INVENTORY_INI",       value: "{{ lookup('env','HUBOT_ANSIBLE_INVENTORY_INI') }}" }
     - { key: "HUBOT_ANSIBLE_INVENTORY_FILE",      value: "{{ lookup('env','HUBOT_ANSIBLE_INVENTORY_FILE') }}" }
     - { key: "HUBOT_ANSIBLE_PRIVATE_KEY",         value: "{{ lookup('env','HUBOT_ANSIBLE_PRIVATE_KEY') }}" }
