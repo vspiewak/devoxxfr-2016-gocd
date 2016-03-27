@@ -67,6 +67,7 @@ Configure hubot
     export HUBOT_PEM_PATH=~/.ssh/<pem_file_name>.pem
     export HUBOT_ANSIBLE_HOST_KEY_CHECKING=False
     export HUBOT_EC2_REGION=us-east-1
+
     export HUBOT_AWS_ACCESS_KEY=<hubot_aws_access_key>
     export HUBOT_AWS_SECRET_KEY=<hubot_aws_secret_key>
     export HUBOT_AWS_ACCESS_KEY_ID=$HUBOT_AWS_ACCESS_KEY
@@ -82,10 +83,14 @@ Create EC2 instances
 Configure EC2 instances
 -----------------------
 
+    ansible-playbook -i inventory/ec2.py playbooks/configure-eip.yml
+    rm -rf ~/.ansible/tmp
     ansible-playbook -i inventory/ec2.py playbooks/site.yml
 
     <or>
 
+    ansible-playbook -i inventory/ec2.py playbooks/configure-eip.yml
+    rm -rf ~/.ansible/tmp
     ansible-playbook -i inventory/ec2.py playbooks/haproxy.yml
     ansible-playbook -i inventory/ec2.py playbooks/gocd-server.yml
     ansible-playbook -i inventory/ec2.py playbooks/gocd-agent.yml
