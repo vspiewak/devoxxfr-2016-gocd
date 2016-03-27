@@ -128,7 +128,7 @@
             <tasks>
               <exec command="/bin/bash">
                 <arg>-c</arg>
-                <arg>curl -X POST http://{{hubot_server.ec2_private_ip_address}}:8080/hubot/say -d message="You can &lt;https://github.com/vspiewak/react-redux-boilerplate/commit/$GO_PIPELINE_LABEL|review this commit&gt; and then &lt;http://{{gocd_server.ec2_ip_address}}:8153/go/pipelines/$GO_PIPELINE_NAME/$GO_PIPELINE_COUNTER/$GO_STAGE_NAME/$GO_STAGE_COUNTER|deploy it&gt; to the next environnement" -d room='##dev-team' -d color='##87579B' -d author_name='GoCD' -d author_link="http://{{gocd_server.ec2_ip_address}}:8153/go/pipelines/$GO_PIPELINE_NAME/$GO_PIPELINE_COUNTER/$GO_STAGE_NAME/$GO_STAGE_COUNTER" -d title="Version $GO_PIPELINE_LABEL deployed on $GO_ENVIRONMENT_NAME" -d title_link='http://{{node_dev_server.ec2_ip_address}}' -d thumb_url='https://raw.githubusercontent.com/vspiewak/nono/master/assets/gocd_thumb_url.gif'</arg>
+                <arg>curl -X POST http://{{hubot_server.ec2_private_ip_address}}:8080/hubot/say -d message="You can &lt;https://github.com/vspiewak/react-redux-boilerplate/commit/$GO_PIPELINE_LABEL|review this commit&gt; and then &lt;http://gocd.devoxx.dailybrain.fr/go/pipelines/$GO_PIPELINE_NAME/$GO_PIPELINE_COUNTER/$GO_STAGE_NAME/$GO_STAGE_COUNTER|deploy it&gt; to the next environnement" -d room='##dev-team' -d color='##87579B' -d author_name='GoCD' -d author_link="http://gocd.devoxx.dailybrain.fr/go/pipelines/$GO_PIPELINE_NAME/$GO_PIPELINE_COUNTER/$GO_STAGE_NAME/$GO_STAGE_COUNTER" -d title="Version $GO_PIPELINE_LABEL deployed on $GO_ENVIRONMENT_NAME" -d title_link='http://dev.devoxx.dailybrain.fr' -d thumb_url='https://raw.githubusercontent.com/vspiewak/nono/master/assets/gocd_thumb_url.gif'</arg>
                 <runif status="passed" />
               </exec>
             </tasks>
@@ -227,7 +227,7 @@
             <tasks>
               <exec command="/bin/bash">
                 <arg>-c</arg>
-                <arg>curl -X POST http://{{hubot_server.ec2_private_ip_address}}:8080/hubot/say -d message="You can &lt;https://github.com/vspiewak/react-redux-boilerplate/commit/$GO_PIPELINE_LABEL|review this commit&gt; and then &lt;http://{{gocd_server.ec2_ip_address}}:8153/go/pipelines/$GO_PIPELINE_NAME/$GO_PIPELINE_COUNTER/$GO_STAGE_NAME/$GO_STAGE_COUNTER|deploy it&gt; to the next environnement" -d room='##dev-team' -d color='##87579B' -d author_name='GoCD' -d author_link="http://{{gocd_server.ec2_ip_address}}:8153/go/pipelines/$GO_PIPELINE_NAME/$GO_PIPELINE_COUNTER/$GO_STAGE_NAME/$GO_STAGE_COUNTER" -d title="Version $GO_PIPELINE_LABEL deployed on $GO_ENVIRONMENT_NAME" -d title_link='http://{{node_demo_server.ec2_ip_address}}' -d thumb_url='https://raw.githubusercontent.com/vspiewak/nono/master/assets/gocd_thumb_url.gif'</arg>
+                <arg>curl -X POST http://{{hubot_server.ec2_private_ip_address}}:8080/hubot/say -d message="You can &lt;https://github.com/vspiewak/react-redux-boilerplate/commit/$GO_PIPELINE_LABEL|review this commit&gt; and then &lt;http://gocd.devoxx.dailybrain.fr/go/pipelines/$GO_PIPELINE_NAME/$GO_PIPELINE_COUNTER/$GO_STAGE_NAME/$GO_STAGE_COUNTER|deploy it&gt; to the next environnement" -d room='##dev-team' -d color='##87579B' -d author_name='GoCD' -d author_link="http://gocd.devoxx.dailybrain.fr/go/pipelines/$GO_PIPELINE_NAME/$GO_PIPELINE_COUNTER/$GO_STAGE_NAME/$GO_STAGE_COUNTER" -d title="Version $GO_PIPELINE_LABEL deployed on $GO_ENVIRONMENT_NAME" -d title_link='http://demo.devoxx.dailybrain.fr' -d thumb_url='https://raw.githubusercontent.com/vspiewak/nono/master/assets/gocd_thumb_url.gif'</arg>
                 <runif status="passed" />
               </exec>
             </tasks>
@@ -269,7 +269,7 @@
                 <arg>sitespeed:desktop</arg>
                 <arg>--</arg>
                 <arg>-u</arg>
-                <arg>http://{{node_demo_server.ec2_ip_address}}</arg>
+                <arg>http://demo.devoxx.dailybrain.fr</arg>
                 <runif status="passed" />
               </exec>
             </tasks>
@@ -297,7 +297,7 @@
                 <arg>sitespeed:mobile</arg>
                 <arg>--</arg>
                 <arg>-u</arg>
-                <arg>http://{{node_demo_server.ec2_ip_address}}</arg>
+                <arg>http://demo.devoxx.dailybrain.fr</arg>
                 <runif status="passed" />
               </exec>
             </tasks>
