@@ -100,5 +100,11 @@
   lineinfile: dest=/etc/default/go-agent regexp="^export AGENT_MAX_MEM=" line="export AGENT_MAX_MEM={{gocd_max_mem}}" state=present
   notify: Restart GoCD agent
 
+- name: Configure GitHub OAuth Token
+  template: src=dotgithub.j2 dest=~/.github owner=go group=go mode=0644
+  become: yes
+  become_user: go
+  notify: Restart GoCD server
+
 - name: Enable go-agent service at boot
   service: name=go-agent enabled=yes

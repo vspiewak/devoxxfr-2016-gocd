@@ -108,3 +108,12 @@ Terminate EC2 instances
 -----------------------
 
     ansible-playbook -i inventory/ec2.py playbooks/terminate-ec2.yml
+
+
+Source
+------
+
+* http://continuousdelivery.com/talks/
+* http://fr.slideshare.net/jezhumble/continuous-delivery-5359386
+* http://www.slideshare.net/fwendt/gocd-the-tool-that-jenkins-aint
+* https://build.go.cd (user: view, pass: password)

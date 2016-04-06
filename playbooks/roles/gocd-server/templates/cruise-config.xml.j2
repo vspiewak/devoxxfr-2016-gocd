@@ -26,6 +26,17 @@
       </admins>
     </security>
   </server>
+  <scms>
+    <scm id="e52d20eb-7e3e-447a-bc2d-cf202440a625" name="boilerplate">
+      <pluginConfiguration id="github.pr" version="1" />
+      <configuration>
+        <property>
+          <key>url</key>
+          <value>https://github.com/vspiewak/react-redux-boilerplate.git</value>
+        </property>
+      </configuration>
+    </scm>
+  </scms>
   <pipelines group="Boilerplate">
     <authorization>
       <view>
@@ -497,6 +508,65 @@
       </stage>
     </pipeline>
   </pipelines>
+  <pipelines group="Boilerplate_GitHub">
+    <pipeline name="Build_Master" labeltemplate="${boilerplate[:7]}" isLocked="false" template="Build_Boilerplate_Template">
+      <trackingtool link="https://github.com/vspiewak/react-redux-boilerplate/issues/${ID}" regex="##(\d+)" />
+      <materials>
+        <git url="https://github.com/vspiewak/react-redux-boilerplate.git" materialName="boilerplate" />
+      </materials>
+    </pipeline>
+    <pipeline name="Build_PullRequest" labeltemplate="${boilerplate[:7]}" isLocked="false" template="Build_Boilerplate_Template">
+      <trackingtool link="https://github.com/vspiewak/react-redux-boilerplate/issues/${ID}" regex="##(\d+)" />
+      <materials>
+        <scm ref="e52d20eb-7e3e-447a-bc2d-cf202440a625" />
+      </materials>
+    </pipeline>
+  </pipelines>
+  <templates>
+    <pipeline name="Build_Boilerplate_Template">
+      <stage name="npm" cleanWorkingDir="true">
+        <jobs>
+          <job name="package">
+            <tasks>
+              <exec command="npm">
+                <arg>install</arg>
+                <runif status="passed" />
+              </exec>
+              <exec command="npm">
+                <arg>run</arg>
+                <arg>lint</arg>
+                <runif status="passed" />
+              </exec>
+              <exec command="npm">
+                <arg>run</arg>
+                <arg>test</arg>
+                <runif status="passed" />
+              </exec>
+              <exec command="npm">
+                <arg>run</arg>
+                <arg>build</arg>
+                <runif status="passed" />
+              </exec>
+              <exec command="/bin/bash">
+                <arg>-c</arg>
+                <arg>PKG_ID=$GO_PIPELINE_LABEL npm run package</arg>
+                <runif status="passed" />
+              </exec>
+              <exec command="/bin/bash">
+                <arg>-c</arg>
+                <arg>DIST_ID=$GO_PIPELINE_LABEL npm run dist</arg>
+                <runif status="passed" />
+              </exec>
+            </tasks>
+            <artifacts>
+              <artifact src="pkg*.zip" dest="pkg" />
+              <artifact src="dist*.zip" dest="dist" />
+            </artifacts>
+          </job>
+        </jobs>
+      </stage>
+    </pipeline>
+  </templates>
   <environments>
     <environment name="Dev">
       <environmentvariables>
@@ -517,6 +587,8 @@
       </agents>
       <pipelines>
         <pipeline name="Build" />
+        <pipeline name="Build_Master" />
+        <pipeline name="Build_PullRequest" />
         <pipeline name="DeployToDev" />
         <pipeline name="DevReview" />
       </pipelines>

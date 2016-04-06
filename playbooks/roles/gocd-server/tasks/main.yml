@@ -54,12 +54,28 @@
 - name: Configure cipher
   copy: src=cipher dest=/etc/go/cipher owner=go group=go mode=0644
 
+- name: Install GitHub Pull Request Puller plugin
+  get_url: url=https://github.com/ashwanthkumar/gocd-build-github-pull-requests/releases/download/v1.2.4/github-pr-poller-1.2.4.jar dest=/var/lib/go-server/plugins/external mode=0644
+
+- name: Install GitHub Pull Request Status Notifier plugin
+  get_url: url=https://github.com/gocd-contrib/gocd-build-status-notifier/releases/download/1.1/github-pr-status-1.1.jar dest=/var/lib/go-server/plugins/external mode=0644
+
+- name: Configure GitHub OAuth Token
+  template: src=dotgithub.j2 dest=~/.github owner=go group=go mode=0644
+  become: yes
+  become_user: go
+  notify: Restart GoCD server
+
 - name: Configure go-server default
   template: src=default.j2 dest=/etc/default/go-server owner=go group=go mode=0644
   notify: Restart GoCD server
 
 - name: Configure SERVER_MAX_MEM environment variable
   lineinfile: dest=/etc/default/go-server regexp="^export SERVER_MAX_MEM" line="export SERVER_MAX_MEM={{gocd_max_mem}}" state=present
+  notify: Restart GoCD server
+
+- name: Configure GO_SERVER_SYSTEM_PROPERTIES environment variable
+  lineinfile: dest=/etc/default/go-server regexp="^export GO_SERVER_SYSTEM_PROPERTIES" line="export GO_SERVER_SYSTEM_PROPERTIES='-Dgo.plugin.build.status.go-server=http://gocd.devoxx.dailybrain.fr'" state=present
   notify: Restart GoCD server
 
 - name: Configure cruise-config.xml
