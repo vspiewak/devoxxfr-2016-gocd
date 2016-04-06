@@ -4,5 +4,5 @@
 - include: haproxy.yml
 - include: gocd-server.yml
 - include: gocd-agent.yml
-- include: hubot.yml
 - include: nodes.yml
+- include: hubot.yml
