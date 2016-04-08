@@ -105,36 +105,14 @@
         <pipeline pipelineName="Build" stageName="npm" materialName="boilerplate" />
       </materials>
     </pipeline>
-    <pipeline name="DevReview" labeltemplate="${boilerplate[:7]}" isLocked="false">
+    <pipeline name="DevReview" labeltemplate="${boilerplate[:7]}" isLocked="false" template="ReviewTemplate">
+      <params>
+        <param name="room">#dev-team</param>
+      </params>
       <trackingtool link="https://github.com/vspiewak/react-redux-boilerplate/issues/${ID}" regex="##(\d+)" />
       <materials>
         <pipeline pipelineName="DeployToDev" stageName="acceptance-tests" materialName="boilerplate" />
       </materials>
-      <stage name="notify" fetchMaterials="false">
-        <jobs>
-          <job name="notify">
-            <tasks>
-              <exec command="/bin/bash">
-                <arg>-c</arg>
-                <arg>curl -X POST http://{{hubot_server.ec2_private_ip_address}}:8080/hubot/say -d message="You can &lt;https://github.com/vspiewak/react-redux-boilerplate/commit/$GO_PIPELINE_LABEL|review this commit&gt; and then &lt;http://gocd.devoxx.dailybrain.fr/go/pipelines/$GO_PIPELINE_NAME/$GO_PIPELINE_COUNTER/$GO_STAGE_NAME/$GO_STAGE_COUNTER|deploy it&gt; to the next environnement" -d room='##dev-team' -d color='##87579B' -d author_name='GoCD' -d author_link="http://gocd.devoxx.dailybrain.fr/go/pipelines/$GO_PIPELINE_NAME/$GO_PIPELINE_COUNTER/$GO_STAGE_NAME/$GO_STAGE_COUNTER" -d title="Version $GO_PIPELINE_LABEL deployed on $GO_ENVIRONMENT_NAME" -d title_link='http://dev.devoxx.dailybrain.fr' -d thumb_url='https://raw.githubusercontent.com/vspiewak/nono/master/assets/gocd_thumb_url.gif'</arg>
-                <runif status="passed" />
-              </exec>
-            </tasks>
-          </job>
-        </jobs>
-      </stage>
-      <stage name="validate">
-        <approval type="manual" />
-        <jobs>
-          <job name="validate">
-            <tasks>
-              <exec command="echo">
-                <arg>"validated"</arg>
-              </exec>
-            </tasks>
-          </job>
-        </jobs>
-      </stage>
     </pipeline>
     <pipeline name="DeployToDemo" labeltemplate="${boilerplate[:7]}" isLocked="false" template="DeployTemplate">
       <params>
@@ -145,41 +123,15 @@
         <pipeline pipelineName="DevReview" stageName="validate" materialName="boilerplate" />
       </materials>
     </pipeline>
-    <pipeline name="POReview" labeltemplate="${boilerplate[:7]}" isLocked="false">
+    <pipeline name="POReview" labeltemplate="${boilerplate[:7]}" isLocked="false" template="ReviewTemplate">
+      <params>
+        <param name="room">#market-team</param>
+      </params>
       <trackingtool link="https://github.com/vspiewak/react-redux-boilerplate/issues/${ID}" regex="##(\d+)" />
       <materials>
         <pipeline pipelineName="DeployToDemo" stageName="acceptance-tests" materialName="boilerplate" />
       </materials>
-      <stage name="notify" fetchMaterials="false">
-        <jobs>
-          <job name="notify">
-            <tasks>
-              <exec command="/bin/bash">
-                <arg>-c</arg>
-                <arg>curl -X POST http://{{hubot_server.ec2_private_ip_address}}:8080/hubot/say -d message="You can &lt;https://github.com/vspiewak/react-redux-boilerplate/commit/$GO_PIPELINE_LABEL|review this commit&gt; and then &lt;http://gocd.devoxx.dailybrain.fr/go/pipelines/$GO_PIPELINE_NAME/$GO_PIPELINE_COUNTER/$GO_STAGE_NAME/$GO_STAGE_COUNTER|deploy it&gt; to the next environnement" -d room='##dev-team' -d color='##87579B' -d author_name='GoCD' -d author_link="http://gocd.devoxx.dailybrain.fr/go/pipelines/$GO_PIPELINE_NAME/$GO_PIPELINE_COUNTER/$GO_STAGE_NAME/$GO_STAGE_COUNTER" -d title="Version $GO_PIPELINE_LABEL deployed on $GO_ENVIRONMENT_NAME" -d title_link='http://demo.devoxx.dailybrain.fr' -d thumb_url='https://raw.githubusercontent.com/vspiewak/nono/master/assets/gocd_thumb_url.gif'</arg>
-                <runif status="passed" />
-              </exec>
-            </tasks>
-          </job>
-        </jobs>
-      </stage>
-      <stage name="validate">
-        <approval type="manual">
-          <authorization>
-            <role>ProductOwners</role>
-          </authorization>
-        </approval>
-        <jobs>
-          <job name="validate">
-            <tasks>
-              <exec command="echo">
-                <arg>"validated"</arg>
-              </exec>
-            </tasks>
-          </job>
-        </jobs>
-      </stage>
-    </pipeline>
+    </pipeline>    
     <pipeline name="Performances" labeltemplate="${boilerplate[:7]}" isLocked="false">
       <trackingtool link="https://github.com/vspiewak/react-redux-boilerplate/issues/${ID}" regex="##(\d+)" />
       <materials>
@@ -414,6 +366,33 @@
         </jobs>
       </stage>
     </pipeline>
+    <pipeline name="ReviewTemplate">
+      <stage name="notify" fetchMaterials="false">
+        <jobs>
+          <job name="notify">
+            <tasks>
+              <exec command="/bin/bash">
+                <arg>-c</arg>
+                <arg>curl -X POST http://{{hubot_server.ec2_private_ip_address}}:8080/hubot/say -d message="You can &lt;https://github.com/vspiewak/react-redux-boilerplate/commit/$GO_PIPELINE_LABEL|review this commit&gt; and then &lt;http://gocd.devoxx.dailybrain.fr/go/pipelines/$GO_PIPELINE_NAME/$GO_PIPELINE_COUNTER/$GO_STAGE_NAME/$GO_STAGE_COUNTER|deploy it&gt; to the next environnement" -d room='#{room}' -d color='##87579B' -d author_name='GoCD' -d author_link="http://gocd.devoxx.dailybrain.fr/go/pipelines/$GO_PIPELINE_NAME/$GO_PIPELINE_COUNTER/$GO_STAGE_NAME/$GO_STAGE_COUNTER" -d title="Version $GO_PIPELINE_LABEL deployed on $GO_ENVIRONMENT_NAME" -d title_link="$APP_URL" -d thumb_url='https://raw.githubusercontent.com/vspiewak/nono/master/assets/gocd_thumb_url.gif'</arg>
+                <runif status="passed" />
+              </exec>
+            </tasks>
+          </job>
+        </jobs>
+      </stage>
+      <stage name="validate">
+        <approval type="manual" />
+        <jobs>
+          <job name="validate">
+            <tasks>
+              <exec command="echo">
+                <arg>"validated"</arg>
+              </exec>
+            </tasks>
+          </job>
+        </jobs>
+      </stage>
+    </pipeline>
     <pipeline name="Build_Boilerplate_Template">
       <stage name="npm" cleanWorkingDir="true">
         <jobs>
@@ -461,6 +440,9 @@
   <environments>
     <environment name="Dev">
       <environmentvariables>
+        <variable name="APP_URL">
+          <value>http://dev.devoxx.dailybrain.fr</value>
+        </variable>
         <variable name="DEPLOY_HOST">
           <value>{{node_dev_server.ec2_private_ip_address}}</value>
         </variable>
@@ -486,6 +468,9 @@
     </environment>
     <environment name="Demo">
       <environmentvariables>
+        <variable name="APP_URL">
+          <value>http://demo.devoxx.dailybrain.fr</value>
+        </variable>
         <variable name="DEPLOY_HOST">
           <value>{{node_demo_server.ec2_private_ip_address}}</value>
         </variable>
