@@ -96,128 +96,14 @@
         </jobs>
       </stage>
     </pipeline>
-    <pipeline name="DeployToDev" labeltemplate="${boilerplate[:7]}" isLocked="false">
+    <pipeline name="DeployToDev" labeltemplate="${boilerplate[:7]}" isLocked="false" template="DeployTemplate">
+      <params>
+        <param name="pipelineName">Build</param>
+      </params>
       <trackingtool link="https://github.com/vspiewak/react-redux-boilerplate/issues/${ID}" regex="##(\d+)" />
       <materials>
         <pipeline pipelineName="Build" stageName="npm" materialName="boilerplate" />
       </materials>
-      <stage name="deploy" fetchMaterials="false" cleanWorkingDir="true">
-        <jobs>
-          <job name="deploy">
-            <tasks>
-              <fetchartifact pipeline="Build" stage="npm" job="package" srcdir="pkg">
-                <runif status="passed" />
-              </fetchartifact>
-              <exec command="/bin/bash">
-                <arg>-c</arg>
-                <arg>ssh -i $DEPLOY_KEY $DEPLOY_USER@$DEPLOY_HOST "rm -rf ~/app"</arg>
-                <runif status="passed" />
-              </exec>
-              <exec command="/bin/bash">
-                <arg>-c</arg>
-                <arg>ssh -i $DEPLOY_KEY $DEPLOY_USER@$DEPLOY_HOST "mkdir ~/app"</arg>
-                <runif status="passed" />
-              </exec>
-              <exec command="/bin/bash">
-                <arg>-c</arg>
-                <arg>scp -i $DEPLOY_KEY pkg/*.zip $DEPLOY_USER@$DEPLOY_HOST:~/app</arg>
-                <runif status="passed" />
-              </exec>
-              <exec command="/bin/bash">
-                <arg>-c</arg>
-                <arg>ssh -i $DEPLOY_KEY $DEPLOY_USER@$DEPLOY_HOST "cd ~/app; unzip -qq *.zip"</arg>
-                <runif status="passed" />
-              </exec>
-              <exec command="/bin/bash">
-                <arg>-c</arg>
-                <arg>ssh -i $DEPLOY_KEY $DEPLOY_USER@$DEPLOY_HOST "rm ~/app/*.zip"</arg>
-                <runif status="passed" />
-              </exec>
-              <exec command="/bin/bash">
-                <arg>-c</arg>
-                <arg>ssh -i $DEPLOY_KEY $DEPLOY_USER@$DEPLOY_HOST "whoami"</arg>
-                <runif status="passed" />
-              </exec>
-            </tasks>
-          </job>
-        </jobs>
-      </stage>
-      <stage name="integration-tests" fetchMaterials="false" cleanWorkingDir="true">
-        <jobs>
-          <job name="integration-tests-smoke">
-            <tasks>
-              <fetchartifact pipeline="Build" stage="npm" job="package" srcdir="dist">
-                <runif status="passed" />
-              </fetchartifact>
-              <exec command="unzip" workingdir="dist">
-                <arg>-qq</arg>
-                <arg>*.zip</arg>
-                <runif status="passed" />
-              </exec>
-              <exec command="/bin/bash" workingdir="dist">
-                <arg>-c</arg>
-                <arg>LAUNCH_URL=http://$DEPLOY_HOST npm run e2e -- --group smoke</arg>
-                <runif status="passed" />
-              </exec>
-            </tasks>
-          </job>
-          <job name="integration-tests-landing">
-            <tasks>
-              <fetchartifact pipeline="Build" stage="npm" job="package" srcdir="dist">
-                <runif status="passed" />
-              </fetchartifact>
-              <exec command="unzip" workingdir="dist">
-                <arg>-qq</arg>
-                <arg>*.zip</arg>
-                <runif status="passed" />
-              </exec>
-              <exec command="/bin/bash" workingdir="dist">
-                <arg>-c</arg>
-                <arg>LAUNCH_URL=http://$DEPLOY_HOST npm run e2e -- --group landing</arg>
-                <runif status="passed" />
-              </exec>
-            </tasks>
-          </job>
-        </jobs>
-      </stage>
-      <stage name="acceptance-tests" fetchMaterials="false" cleanWorkingDir="true">
-        <jobs>
-          <job name="acceptance-tests-smoke">
-            <tasks>
-              <fetchartifact pipeline="Build" stage="npm" job="package" srcdir="dist">
-                <runif status="passed" />
-              </fetchartifact>
-              <exec command="unzip" workingdir="dist">
-                <arg>-qq</arg>
-                <arg>*.zip</arg>
-                <runif status="passed" />
-              </exec>
-              <exec command="/bin/bash" workingdir="dist">
-                <arg>-c</arg>
-                <arg>LAUNCH_URL=http://$DEPLOY_HOST npm run bdd -- --group smoke</arg>
-                <runif status="passed" />
-              </exec>
-            </tasks>
-          </job>
-          <job name="acceptance-tests-landing">
-            <tasks>
-              <fetchartifact pipeline="Build" stage="npm" job="package" srcdir="dist">
-                <runif status="passed" />
-              </fetchartifact>
-              <exec command="unzip" workingdir="dist">
-                <arg>-qq</arg>
-                <arg>*.zip</arg>
-                <runif status="passed" />
-              </exec>
-              <exec command="/bin/bash" workingdir="dist">
-                <arg>-c</arg>
-                <arg>LAUNCH_URL=http://$DEPLOY_HOST npm run bdd -- --group landing</arg>
-                <runif status="passed" />
-              </exec>
-            </tasks>
-          </job>
-        </jobs>
-      </stage>
     </pipeline>
     <pipeline name="DevReview" labeltemplate="${boilerplate[:7]}" isLocked="false">
       <trackingtool link="https://github.com/vspiewak/react-redux-boilerplate/issues/${ID}" regex="##(\d+)" />
@@ -250,128 +136,14 @@
         </jobs>
       </stage>
     </pipeline>
-    <pipeline name="DeployToDemo" labeltemplate="${boilerplate[:7]}" isLocked="false">
+    <pipeline name="DeployToDemo" labeltemplate="${boilerplate[:7]}" isLocked="false" template="DeployTemplate">
+      <params>
+        <param name="pipelineName">Build/DeployToDev/DevReview</param>
+      </params>
       <trackingtool link="https://github.com/vspiewak/react-redux-boilerplate/issues/${ID}" regex="##(\d+)" />
       <materials>
         <pipeline pipelineName="DevReview" stageName="validate" materialName="boilerplate" />
       </materials>
-      <stage name="deploy" fetchMaterials="false" cleanWorkingDir="true">
-        <jobs>
-          <job name="deploy">
-            <tasks>
-              <fetchartifact pipeline="Build/DeployToDev/DevReview" stage="npm" job="package" srcdir="pkg">
-                <runif status="passed" />
-              </fetchartifact>
-              <exec command="/bin/bash">
-                <arg>-c</arg>
-                <arg>ssh -i $DEPLOY_KEY $DEPLOY_USER@$DEPLOY_HOST "rm -rf ~/app"</arg>
-                <runif status="passed" />
-              </exec>
-              <exec command="/bin/bash">
-                <arg>-c</arg>
-                <arg>ssh -i $DEPLOY_KEY $DEPLOY_USER@$DEPLOY_HOST "mkdir ~/app"</arg>
-                <runif status="passed" />
-              </exec>
-              <exec command="/bin/bash">
-                <arg>-c</arg>
-                <arg>scp -i $DEPLOY_KEY pkg/*.zip $DEPLOY_USER@$DEPLOY_HOST:~/app</arg>
-                <runif status="passed" />
-              </exec>
-              <exec command="/bin/bash">
-                <arg>-c</arg>
-                <arg>ssh -i $DEPLOY_KEY $DEPLOY_USER@$DEPLOY_HOST "cd ~/app; unzip -qq *.zip"</arg>
-                <runif status="passed" />
-              </exec>
-              <exec command="/bin/bash">
-                <arg>-c</arg>
-                <arg>ssh -i $DEPLOY_KEY $DEPLOY_USER@$DEPLOY_HOST "rm ~/app/*.zip"</arg>
-                <runif status="passed" />
-              </exec>
-              <exec command="/bin/bash">
-                <arg>-c</arg>
-                <arg>ssh -i $DEPLOY_KEY $DEPLOY_USER@$DEPLOY_HOST "whoami"</arg>
-                <runif status="passed" />
-              </exec>
-            </tasks>
-          </job>
-        </jobs>
-      </stage>
-      <stage name="integration-tests" fetchMaterials="false" cleanWorkingDir="true">
-        <jobs>
-          <job name="integration-tests-smoke">
-            <tasks>
-              <fetchartifact pipeline="Build/DeployToDev/DevReview" stage="npm" job="package" srcdir="dist">
-                <runif status="passed" />
-              </fetchartifact>
-              <exec command="unzip" workingdir="dist">
-                <arg>-qq</arg>
-                <arg>*.zip</arg>
-                <runif status="passed" />
-              </exec>
-              <exec command="/bin/bash" workingdir="dist">
-                <arg>-c</arg>
-                <arg>LAUNCH_URL=http://$DEPLOY_HOST npm run e2e -- --group smoke</arg>
-                <runif status="passed" />
-              </exec>
-            </tasks>
-          </job>
-          <job name="integration-tests-landing">
-            <tasks>
-              <fetchartifact pipeline="Build/DeployToDev/DevReview" stage="npm" job="package" srcdir="dist">
-                <runif status="passed" />
-              </fetchartifact>
-              <exec command="unzip" workingdir="dist">
-                <arg>-qq</arg>
-                <arg>*.zip</arg>
-                <runif status="passed" />
-              </exec>
-              <exec command="/bin/bash" workingdir="dist">
-                <arg>-c</arg>
-                <arg>LAUNCH_URL=http://$DEPLOY_HOST npm run e2e -- --group landing</arg>
-                <runif status="passed" />
-              </exec>
-            </tasks>
-          </job>
-        </jobs>
-      </stage>
-      <stage name="acceptance-tests" fetchMaterials="false" cleanWorkingDir="true">
-        <jobs>
-          <job name="acceptance-tests-smoke">
-            <tasks>
-              <fetchartifact pipeline="Build/DeployToDev/DevReview" stage="npm" job="package" srcdir="dist">
-                <runif status="passed" />
-              </fetchartifact>
-              <exec command="unzip" workingdir="dist">
-                <arg>-qq</arg>
-                <arg>*.zip</arg>
-                <runif status="passed" />
-              </exec>
-              <exec command="/bin/bash" workingdir="dist">
-                <arg>-c</arg>
-                <arg>LAUNCH_URL=http://$DEPLOY_HOST npm run bdd -- --group smoke</arg>
-                <runif status="passed" />
-              </exec>
-            </tasks>
-          </job>
-          <job name="acceptance-tests-landing">
-            <tasks>
-              <fetchartifact pipeline="Build/DeployToDev/DevReview" stage="npm" job="package" srcdir="dist">
-                <runif status="passed" />
-              </fetchartifact>
-              <exec command="unzip" workingdir="dist">
-                <arg>-qq</arg>
-                <arg>*.zip</arg>
-                <runif status="passed" />
-              </exec>
-              <exec command="/bin/bash" workingdir="dist">
-                <arg>-c</arg>
-                <arg>LAUNCH_URL=http://$DEPLOY_HOST npm run bdd -- --group landing</arg>
-                <runif status="passed" />
-              </exec>
-            </tasks>
-          </job>
-        </jobs>
-      </stage>
     </pipeline>
     <pipeline name="POReview" labeltemplate="${boilerplate[:7]}" isLocked="false">
       <trackingtool link="https://github.com/vspiewak/react-redux-boilerplate/issues/${ID}" regex="##(\d+)" />
@@ -523,6 +295,125 @@
     </pipeline>
   </pipelines>
   <templates>
+    <pipeline name="DeployTemplate">
+      <stage name="deploy" fetchMaterials="false" cleanWorkingDir="true">
+        <jobs>
+          <job name="deploy">
+            <tasks>
+              <fetchartifact pipeline="#{pipelineName}" stage="npm" job="package" srcdir="pkg">
+                <runif status="passed" />
+              </fetchartifact>
+              <exec command="/bin/bash">
+                <arg>-c</arg>
+                <arg>ssh -i $DEPLOY_KEY $DEPLOY_USER@$DEPLOY_HOST "rm -rf ~/app"</arg>
+                <runif status="passed" />
+              </exec>
+              <exec command="/bin/bash">
+                <arg>-c</arg>
+                <arg>ssh -i $DEPLOY_KEY $DEPLOY_USER@$DEPLOY_HOST "mkdir ~/app"</arg>
+                <runif status="passed" />
+              </exec>
+              <exec command="/bin/bash">
+                <arg>-c</arg>
+                <arg>scp -i $DEPLOY_KEY pkg/*.zip $DEPLOY_USER@$DEPLOY_HOST:~/app</arg>
+                <runif status="passed" />
+              </exec>
+              <exec command="/bin/bash">
+                <arg>-c</arg>
+                <arg>ssh -i $DEPLOY_KEY $DEPLOY_USER@$DEPLOY_HOST "cd ~/app; unzip -qq *.zip"</arg>
+                <runif status="passed" />
+              </exec>
+              <exec command="/bin/bash">
+                <arg>-c</arg>
+                <arg>ssh -i $DEPLOY_KEY $DEPLOY_USER@$DEPLOY_HOST "rm ~/app/*.zip"</arg>
+                <runif status="passed" />
+              </exec>
+              <exec command="/bin/bash">
+                <arg>-c</arg>
+                <arg>ssh -i $DEPLOY_KEY $DEPLOY_USER@$DEPLOY_HOST "whoami"</arg>
+                <runif status="passed" />
+              </exec>
+            </tasks>
+          </job>
+        </jobs>
+      </stage>
+      <stage name="integration-tests" fetchMaterials="false" cleanWorkingDir="true">
+        <jobs>
+          <job name="integration-tests-smoke">
+            <tasks>
+              <fetchartifact pipeline="#{pipelineName}" stage="npm" job="package" srcdir="dist">
+                <runif status="passed" />
+              </fetchartifact>
+              <exec command="unzip" workingdir="dist">
+                <arg>-qq</arg>
+                <arg>*.zip</arg>
+                <runif status="passed" />
+              </exec>
+              <exec command="/bin/bash" workingdir="dist">
+                <arg>-c</arg>
+                <arg>LAUNCH_URL=http://$DEPLOY_HOST npm run e2e -- --group smoke</arg>
+                <runif status="passed" />
+              </exec>
+            </tasks>
+          </job>
+          <job name="integration-tests-landing">
+            <tasks>
+              <fetchartifact pipeline="#{pipelineName}" stage="npm" job="package" srcdir="dist">
+                <runif status="passed" />
+              </fetchartifact>
+              <exec command="unzip" workingdir="dist">
+                <arg>-qq</arg>
+                <arg>*.zip</arg>
+                <runif status="passed" />
+              </exec>
+              <exec command="/bin/bash" workingdir="dist">
+                <arg>-c</arg>
+                <arg>LAUNCH_URL=http://$DEPLOY_HOST npm run e2e -- --group landing</arg>
+                <runif status="passed" />
+              </exec>
+            </tasks>
+          </job>
+        </jobs>
+      </stage>
+      <stage name="acceptance-tests" fetchMaterials="false" cleanWorkingDir="true">
+        <jobs>
+          <job name="acceptance-tests-smoke">
+            <tasks>
+              <fetchartifact pipeline="#{pipelineName}" stage="npm" job="package" srcdir="dist">
+                <runif status="passed" />
+              </fetchartifact>
+              <exec command="unzip" workingdir="dist">
+                <arg>-qq</arg>
+                <arg>*.zip</arg>
+                <runif status="passed" />
+              </exec>
+              <exec command="/bin/bash" workingdir="dist">
+                <arg>-c</arg>
+                <arg>LAUNCH_URL=http://$DEPLOY_HOST npm run bdd -- --group smoke</arg>
+                <runif status="passed" />
+              </exec>
+            </tasks>
+          </job>
+          <job name="acceptance-tests-landing">
+            <tasks>
+              <fetchartifact pipeline="#{pipelineName}" stage="npm" job="package" srcdir="dist">
+                <runif status="passed" />
+              </fetchartifact>
+              <exec command="unzip" workingdir="dist">
+                <arg>-qq</arg>
+                <arg>*.zip</arg>
+                <runif status="passed" />
+              </exec>
+              <exec command="/bin/bash" workingdir="dist">
+                <arg>-c</arg>
+                <arg>LAUNCH_URL=http://$DEPLOY_HOST npm run bdd -- --group landing</arg>
+                <runif status="passed" />
+              </exec>
+            </tasks>
+          </job>
+        </jobs>
+      </stage>
+    </pipeline>
     <pipeline name="Build_Boilerplate_Template">
       <stage name="npm" cleanWorkingDir="true">
         <jobs>
