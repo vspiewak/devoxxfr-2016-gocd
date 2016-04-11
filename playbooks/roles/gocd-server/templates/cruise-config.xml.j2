@@ -37,7 +37,7 @@
       </configuration>
     </scm>
   </scms>
-  <pipelines group="Boilerplate">
+  <pipelines group="Developers">
     <authorization>
       <view>
         <role>Developers</role>
@@ -46,7 +46,6 @@
       </view>
       <operate>
         <role>Developers</role>
-        <role>ProductOwners</role>
       </operate>
     </authorization>
     <pipeline name="Build" labeltemplate="${boilerplate[:7]}" isLocked="false">
@@ -114,6 +113,27 @@
         <pipeline pipelineName="DeployToDev" stageName="acceptance-tests" materialName="boilerplate" />
       </materials>
     </pipeline>
+    <pipeline name="POReview" labeltemplate="${boilerplate[:7]}" isLocked="false" template="ReviewTemplate">
+      <params>
+        <param name="room">#market-team</param>
+      </params>
+      <trackingtool link="https://github.com/vspiewak/react-redux-boilerplate/issues/${ID}" regex="##(\d+)" />
+      <materials>
+        <pipeline pipelineName="DeployToDemo" stageName="acceptance-tests" materialName="boilerplate" />
+      </materials>
+    </pipeline>
+  </pipelines>
+  <pipelines group="Product_Owners">
+    <authorization>
+      <view>
+        <role>Developers</role>
+        <role>ProductOwners</role>
+        <role>ReadOnlyUsers</role>
+      </view>
+      <operate>
+        <role>ProductOwners</role>
+      </operate>
+    </authorization>
     <pipeline name="DeployToDemo" labeltemplate="${boilerplate[:7]}" isLocked="false" template="DeployTemplate">
       <params>
         <param name="pipelineName">Build/DeployToDev/DevReview</param>
@@ -123,15 +143,6 @@
         <pipeline pipelineName="DevReview" stageName="validate" materialName="boilerplate" />
       </materials>
     </pipeline>
-    <pipeline name="POReview" labeltemplate="${boilerplate[:7]}" isLocked="false" template="ReviewTemplate">
-      <params>
-        <param name="room">#market-team</param>
-      </params>
-      <trackingtool link="https://github.com/vspiewak/react-redux-boilerplate/issues/${ID}" regex="##(\d+)" />
-      <materials>
-        <pipeline pipelineName="DeployToDemo" stageName="acceptance-tests" materialName="boilerplate" />
-      </materials>
-    </pipeline>    
     <pipeline name="Performances" labeltemplate="${boilerplate[:7]}" isLocked="false">
       <trackingtool link="https://github.com/vspiewak/react-redux-boilerplate/issues/${ID}" regex="##(\d+)" />
       <materials>
@@ -232,7 +243,7 @@
       </stage>
     </pipeline>
   </pipelines>
-  <pipelines group="Boilerplate_GitHub">
+  <pipelines group="Features">
     <pipeline name="Build_Master" labeltemplate="${boilerplate[:7]}" isLocked="false" template="Build_Boilerplate_Template">
       <trackingtool link="https://github.com/vspiewak/react-redux-boilerplate/issues/${ID}" regex="##(\d+)" />
       <materials>
