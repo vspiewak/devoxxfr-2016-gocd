@@ -113,15 +113,15 @@
         <pipeline pipelineName="DeployToDev" stageName="acceptance-tests" materialName="boilerplate" />
       </materials>
     </pipeline>
-    <pipeline name="POReview" labeltemplate="${boilerplate[:7]}" isLocked="false" template="ReviewTemplate">
+    <pipeline name="DeployToDemo" labeltemplate="${boilerplate[:7]}" isLocked="false" template="DeployTemplate">
       <params>
-        <param name="room">#market-team</param>
+        <param name="pipelineName">Build/DeployToDev/DevReview</param>
       </params>
       <trackingtool link="https://github.com/vspiewak/react-redux-boilerplate/issues/${ID}" regex="##(\d+)" />
       <materials>
-        <pipeline pipelineName="DeployToDemo" stageName="acceptance-tests" materialName="boilerplate" />
+        <pipeline pipelineName="DevReview" stageName="validate" materialName="boilerplate" />
       </materials>
-    </pipeline>
+    </pipeline>    
   </pipelines>
   <pipelines group="Product_Owners">
     <authorization>
@@ -134,13 +134,13 @@
         <role>ProductOwners</role>
       </operate>
     </authorization>
-    <pipeline name="DeployToDemo" labeltemplate="${boilerplate[:7]}" isLocked="false" template="DeployTemplate">
+    <pipeline name="POReview" labeltemplate="${boilerplate[:7]}" isLocked="false" template="ReviewTemplate">
       <params>
-        <param name="pipelineName">Build/DeployToDev/DevReview</param>
+        <param name="room">#market-team</param>
       </params>
       <trackingtool link="https://github.com/vspiewak/react-redux-boilerplate/issues/${ID}" regex="##(\d+)" />
       <materials>
-        <pipeline pipelineName="DevReview" stageName="validate" materialName="boilerplate" />
+        <pipeline pipelineName="DeployToDemo" stageName="acceptance-tests" materialName="boilerplate" />
       </materials>
     </pipeline>
     <pipeline name="Performances" labeltemplate="${boilerplate[:7]}" isLocked="false">
