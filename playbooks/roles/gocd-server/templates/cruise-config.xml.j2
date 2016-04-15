@@ -121,7 +121,7 @@
       <materials>
         <pipeline pipelineName="DevReview" stageName="validate" materialName="boilerplate" />
       </materials>
-    </pipeline>    
+    </pipeline>
   </pipelines>
   <pipelines group="Product_Owners">
     <authorization>
@@ -257,6 +257,58 @@
       </materials>
     </pipeline>
   </pipelines>
+  <pipelines group="MicroServices">
+    <pipeline name="ServiceA" labeltemplate="${ServiceA[:7]}">
+      <materials>
+        <git url="https://github.com/vspiewak/nono" materialName="ServiceA" />
+      </materials>
+      <stage name="dummyStage">
+        <jobs>
+          <job name="dummyJob">
+            <tasks>
+              <exec command="echo">
+                <arg>"ok"</arg>
+              </exec>
+            </tasks>
+          </job>
+        </jobs>
+      </stage>
+    </pipeline>
+    <pipeline name="ServiceB" labeltemplate="${ServiceB[:7]}">
+      <materials>
+        <git url="https://github.com/vspiewak/react-redux-boilerplate" materialName="ServiceB" />
+      </materials>
+      <stage name="dummyStage" fetchMaterials="false">
+        <jobs>
+          <job name="dummyJob">
+            <tasks>
+              <exec command="echo">
+                <arg>"ok"</arg>
+              </exec>
+            </tasks>
+          </job>
+        </jobs>
+      </stage>
+    </pipeline>
+    <pipeline name="ServiceC" isLocked="false" labeltemplate="${ServiceC[:7]}">
+      <materials>
+        <pipeline pipelineName="ServiceA" stageName="dummyStage" materialName="ServiceA" />
+        <pipeline pipelineName="ServiceB" stageName="dummyStage" materialName="ServiceB" />
+        <git url="https://github.com/vspiewak/hubot-ansible" materialName="ServiceC" />
+      </materials>
+      <stage name="dummyStage" fetchMaterials="false">
+        <jobs>
+          <job name="dummyJob">
+            <tasks>
+              <exec command="echo">
+                <arg>"ok"</arg>
+              </exec>
+            </tasks>
+          </job>
+        </jobs>
+      </stage>
+    </pipeline>
+</pipelines>
   <templates>
     <pipeline name="DeployTemplate">
       <stage name="deploy" fetchMaterials="false" cleanWorkingDir="true">
@@ -475,6 +527,9 @@
         <pipeline name="Build_PullRequest" />
         <pipeline name="DeployToDev" />
         <pipeline name="DevReview" />
+        <pipeline name="ServiceA" />
+        <pipeline name="ServiceB" />
+        <pipeline name="ServiceC" />
       </pipelines>
     </environment>
     <environment name="Demo">
