@@ -1,1 +1,3 @@
 gocd_max_mem: 512m
+phantomjs_user: "go"
+phantomjs_group: "go"
