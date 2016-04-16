@@ -53,32 +53,12 @@
       <materials>
         <git url="https://github.com/vspiewak/react-redux-boilerplate.git" materialName="boilerplate" />
       </materials>
-      <stage name="npm" cleanWorkingDir="true">
+      <stage name="npm-install" cleanWorkingDir="true">
         <jobs>
-          <job name="package">
+          <job name="npm-install">
             <tasks>
               <exec command="npm">
                 <arg>install</arg>
-                <runif status="passed" />
-              </exec>
-              <exec command="npm">
-                <arg>run</arg>
-                <arg>lint</arg>
-                <runif status="passed" />
-              </exec>
-              <exec command="npm">
-                <arg>run</arg>
-                <arg>test</arg>
-                <runif status="passed" />
-              </exec>
-              <exec command="npm">
-                <arg>run</arg>
-                <arg>build</arg>
-                <runif status="passed" />
-              </exec>
-              <exec command="/bin/bash">
-                <arg>-c</arg>
-                <arg>PKG_ID=$GO_PIPELINE_LABEL npm run package</arg>
                 <runif status="passed" />
               </exec>
               <exec command="/bin/bash">
@@ -88,8 +68,78 @@
               </exec>
             </tasks>
             <artifacts>
-              <artifact src="pkg*.zip" dest="pkg" />
               <artifact src="dist*.zip" dest="dist" />
+            </artifacts>
+          </job>
+        </jobs>
+      </stage>
+      <stage name="coding-rules" fetchMaterials="false" cleanWorkingDir="true">
+        <jobs>
+          <job name="lint">
+            <tasks>
+              <fetchartifact pipeline="" stage="npm-install" job="npm-install" srcdir="dist">
+                <runif status="passed" />
+              </fetchartifact>
+              <exec command="unzip" workingdir="dist">
+                <arg>-qq</arg>
+                <arg>*.zip</arg>
+                <runif status="passed" />
+              </exec>
+              <exec command="npm" workingdir="dist">
+                <arg>run</arg>
+                <arg>lint</arg>
+                <runif status="passed" />
+              </exec>
+            </tasks>
+          </job>
+        </jobs>
+      </stage>
+      <stage name="unit-tests" fetchMaterials="false" cleanWorkingDir="true">
+        <jobs>
+          <job name="test">
+            <tasks>
+              <fetchartifact pipeline="" stage="npm-install" job="npm-install" srcdir="dist">
+                <runif status="passed" />
+              </fetchartifact>
+              <exec command="unzip" workingdir="dist">
+                <arg>-qq</arg>
+                <arg>*.zip</arg>
+                <runif status="passed" />
+              </exec>
+              <exec command="npm" workingdir="dist">
+                <arg>run</arg>
+                <arg>test</arg>
+                <runif status="passed" />
+              </exec>
+            </tasks>
+          </job>
+        </jobs>
+      </stage>
+      <stage name="npm-package" fetchMaterials="false" cleanWorkingDir="true">
+        <jobs>
+          <job name="npm-package">
+            <tasks>
+              <fetchartifact pipeline="" stage="npm-install" job="npm-install" srcdir="dist">
+                <runif status="passed" />
+              </fetchartifact>
+              <exec command="unzip" workingdir="dist">
+                <arg>-qq</arg>
+                <arg>*.zip</arg>
+                <runif status="passed" />
+              </exec>
+              <exec command="npm" workingdir="dist">
+                <arg>run</arg>
+                <arg>build</arg>
+                <runif status="passed" />
+              </exec>
+              <exec command="/bin/bash" workingdir="dist">
+                <arg>-c</arg>
+                <arg>PKG_ID=$GO_PIPELINE_LABEL npm run package</arg>
+                <runif status="passed" />
+              </exec>
+            </tasks>
+            <artifacts>
+              <artifact src="dist/pkg*.zip" dest="pkg" />
             </artifacts>
           </job>
         </jobs>
@@ -101,7 +151,7 @@
       </params>
       <trackingtool link="https://github.com/vspiewak/react-redux-boilerplate/issues/${ID}" regex="##(\d+)" />
       <materials>
-        <pipeline pipelineName="Build" stageName="npm" materialName="boilerplate" />
+        <pipeline pipelineName="Build" stageName="npm-package" materialName="boilerplate" />
       </materials>
     </pipeline>
     <pipeline name="DevReview" labeltemplate="${boilerplate[:7]}" isLocked="false" template="ReviewTemplate">
@@ -152,7 +202,7 @@
         <jobs>
           <job name="sitespeed.io-desktop">
             <tasks>
-              <fetchartifact pipeline="Build/DeployToDev/DevReview/DeployToDemo" stage="npm" job="package" srcdir="dist">
+              <fetchartifact pipeline="Build/DeployToDev/DevReview/DeployToDemo" stage="npm-install" job="npm-install" srcdir="dist">
                 <runif status="passed" />
               </fetchartifact>
               <exec command="unzip" workingdir="dist">
@@ -180,7 +230,7 @@
           </job>
           <job name="sitespeed.io-mobile">
             <tasks>
-              <fetchartifact pipeline="Build/DeployToDev/DevReview/DeployToDemo" stage="npm" job="package" srcdir="dist">
+              <fetchartifact pipeline="Build/DeployToDev/DevReview/DeployToDemo" stage="npm-install" job="npm-install" srcdir="dist">
                 <runif status="passed" />
               </fetchartifact>
               <exec command="unzip" workingdir="dist">
@@ -218,7 +268,7 @@
         <jobs>
           <job name="code-analysis">
             <tasks>
-              <fetchartifact pipeline="Build/DeployToDev/DevReview/DeployToDemo" stage="npm" job="package" srcdir="dist">
+              <fetchartifact pipeline="Build/DeployToDev/DevReview/DeployToDemo" stage="npm-install" job="npm-install" srcdir="dist">
                 <runif status="passed" />
               </fetchartifact>
               <exec command="unzip" workingdir="dist">
@@ -237,6 +287,33 @@
             </tabs>
             <artifacts>
               <test src="dist/reports" />
+            </artifacts>
+          </job>
+        </jobs>
+      </stage>
+      <stage name="code-coverage" fetchMaterials="false" cleanWorkingDir="true">
+        <jobs>
+          <job name="code-coverage">
+            <tasks>
+              <fetchartifact pipeline="Build/DeployToDev/DevReview/DeployToDemo" stage="npm-install" job="npm-install" srcdir="dist">
+                <runif status="passed" />
+              </fetchartifact>
+              <exec command="unzip" workingdir="dist">
+                <arg>-qq</arg>
+                <arg>*.zip</arg>
+                <runif status="passed" />
+              </exec>
+              <exec command="npm" workingdir="dist">
+                <arg>run</arg>
+                <arg>coverage</arg>
+                <runif status="passed" />
+              </exec>
+            </tasks>
+            <tabs>
+              <tab name="Coverage" path="coverage/lcov-report/index.html" />
+            </tabs>
+            <artifacts>
+              <test src="dist/coverage" />
             </artifacts>
           </job>
         </jobs>
@@ -315,7 +392,7 @@
         <jobs>
           <job name="deploy">
             <tasks>
-              <fetchartifact pipeline="#{pipelineName}" stage="npm" job="package" srcdir="pkg">
+              <fetchartifact pipeline="#{pipelineName}" stage="npm-package" job="npm-package" srcdir="pkg">
                 <runif status="passed" />
               </fetchartifact>
               <exec command="/bin/bash">
@@ -343,11 +420,6 @@
                 <arg>ssh -i $DEPLOY_KEY $DEPLOY_USER@$DEPLOY_HOST "rm ~/app/*.zip"</arg>
                 <runif status="passed" />
               </exec>
-              <exec command="/bin/bash">
-                <arg>-c</arg>
-                <arg>ssh -i $DEPLOY_KEY $DEPLOY_USER@$DEPLOY_HOST "whoami"</arg>
-                <runif status="passed" />
-              </exec>
             </tasks>
           </job>
         </jobs>
@@ -356,7 +428,7 @@
         <jobs>
           <job name="integration-tests-smoke">
             <tasks>
-              <fetchartifact pipeline="#{pipelineName}" stage="npm" job="package" srcdir="dist">
+              <fetchartifact pipeline="#{pipelineName}" stage="npm-install" job="npm-install" srcdir="dist">
                 <runif status="passed" />
               </fetchartifact>
               <exec command="unzip" workingdir="dist">
@@ -373,7 +445,7 @@
           </job>
           <job name="integration-tests-landing">
             <tasks>
-              <fetchartifact pipeline="#{pipelineName}" stage="npm" job="package" srcdir="dist">
+              <fetchartifact pipeline="#{pipelineName}" stage="npm-install" job="npm-install" srcdir="dist">
                 <runif status="passed" />
               </fetchartifact>
               <exec command="unzip" workingdir="dist">
@@ -394,7 +466,7 @@
         <jobs>
           <job name="acceptance-tests-smoke">
             <tasks>
-              <fetchartifact pipeline="#{pipelineName}" stage="npm" job="package" srcdir="dist">
+              <fetchartifact pipeline="#{pipelineName}" stage="npm-install" job="npm-install" srcdir="dist">
                 <runif status="passed" />
               </fetchartifact>
               <exec command="unzip" workingdir="dist">
@@ -411,7 +483,7 @@
           </job>
           <job name="acceptance-tests-landing">
             <tasks>
-              <fetchartifact pipeline="#{pipelineName}" stage="npm" job="package" srcdir="dist">
+              <fetchartifact pipeline="#{pipelineName}" stage="npm-install" job="npm-install" srcdir="dist">
                 <runif status="passed" />
               </fetchartifact>
               <exec command="unzip" workingdir="dist">
