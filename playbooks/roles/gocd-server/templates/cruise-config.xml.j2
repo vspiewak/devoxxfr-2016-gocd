@@ -48,102 +48,11 @@
         <role>Developers</role>
       </operate>
     </authorization>
-    <pipeline name="Build" labeltemplate="${boilerplate[:7]}" isLocked="false">
+    <pipeline name="Build" labeltemplate="${boilerplate[:7]}" isLocked="false" template="BuildTemplate">
       <trackingtool link="https://github.com/vspiewak/react-redux-boilerplate/issues/${ID}" regex="##(\d+)" />
       <materials>
         <git url="https://github.com/vspiewak/react-redux-boilerplate.git" materialName="boilerplate" />
       </materials>
-      <stage name="npm-install" cleanWorkingDir="true">
-        <jobs>
-          <job name="npm-install">
-            <tasks>
-              <exec command="npm">
-                <arg>install</arg>
-                <runif status="passed" />
-              </exec>
-              <exec command="/bin/bash">
-                <arg>-c</arg>
-                <arg>DIST_ID=$GO_PIPELINE_LABEL npm run dist</arg>
-                <runif status="passed" />
-              </exec>
-            </tasks>
-            <artifacts>
-              <artifact src="dist*.zip" dest="dist" />
-            </artifacts>
-          </job>
-        </jobs>
-      </stage>
-      <stage name="coding-rules" fetchMaterials="false" cleanWorkingDir="true">
-        <jobs>
-          <job name="lint">
-            <tasks>
-              <fetchartifact pipeline="" stage="npm-install" job="npm-install" srcdir="dist">
-                <runif status="passed" />
-              </fetchartifact>
-              <exec command="unzip" workingdir="dist">
-                <arg>-qq</arg>
-                <arg>*.zip</arg>
-                <runif status="passed" />
-              </exec>
-              <exec command="npm" workingdir="dist">
-                <arg>run</arg>
-                <arg>lint</arg>
-                <runif status="passed" />
-              </exec>
-            </tasks>
-          </job>
-        </jobs>
-      </stage>
-      <stage name="unit-tests" fetchMaterials="false" cleanWorkingDir="true">
-        <jobs>
-          <job name="test">
-            <tasks>
-              <fetchartifact pipeline="" stage="npm-install" job="npm-install" srcdir="dist">
-                <runif status="passed" />
-              </fetchartifact>
-              <exec command="unzip" workingdir="dist">
-                <arg>-qq</arg>
-                <arg>*.zip</arg>
-                <runif status="passed" />
-              </exec>
-              <exec command="npm" workingdir="dist">
-                <arg>run</arg>
-                <arg>test</arg>
-                <runif status="passed" />
-              </exec>
-            </tasks>
-          </job>
-        </jobs>
-      </stage>
-      <stage name="npm-package" fetchMaterials="false" cleanWorkingDir="true">
-        <jobs>
-          <job name="npm-package">
-            <tasks>
-              <fetchartifact pipeline="" stage="npm-install" job="npm-install" srcdir="dist">
-                <runif status="passed" />
-              </fetchartifact>
-              <exec command="unzip" workingdir="dist">
-                <arg>-qq</arg>
-                <arg>*.zip</arg>
-                <runif status="passed" />
-              </exec>
-              <exec command="npm" workingdir="dist">
-                <arg>run</arg>
-                <arg>build</arg>
-                <runif status="passed" />
-              </exec>
-              <exec command="/bin/bash" workingdir="dist">
-                <arg>-c</arg>
-                <arg>PKG_ID=$GO_PIPELINE_LABEL npm run package</arg>
-                <runif status="passed" />
-              </exec>
-            </tasks>
-            <artifacts>
-              <artifact src="dist/pkg*.zip" dest="pkg" />
-            </artifacts>
-          </job>
-        </jobs>
-      </stage>
     </pipeline>
     <pipeline name="DeployToDev" labeltemplate="${boilerplate[:7]}" isLocked="false" template="DeployTemplate">
       <params>
@@ -320,14 +229,8 @@
       </stage>
     </pipeline>
   </pipelines>
-  <pipelines group="Features">
-    <pipeline name="Build_Master" labeltemplate="${boilerplate[:7]}" isLocked="false" template="Build_Boilerplate_Template">
-      <trackingtool link="https://github.com/vspiewak/react-redux-boilerplate/issues/${ID}" regex="##(\d+)" />
-      <materials>
-        <git url="https://github.com/vspiewak/react-redux-boilerplate.git" materialName="boilerplate" />
-      </materials>
-    </pipeline>
-    <pipeline name="Build_PullRequest" labeltemplate="${boilerplate[:7]}" isLocked="false" template="Build_Boilerplate_Template">
+  <pipelines group="GitHub">
+    <pipeline name="Build_PullRequest" labeltemplate="${boilerplate[:7]}" isLocked="false" template="BuildTemplate">
       <trackingtool link="https://github.com/vspiewak/react-redux-boilerplate/issues/${ID}" regex="##(\d+)" />
       <materials>
         <scm ref="e52d20eb-7e3e-447a-bc2d-cf202440a625" />
@@ -528,33 +431,13 @@
         </jobs>
       </stage>
     </pipeline>
-    <pipeline name="Build_Boilerplate_Template">
-      <stage name="npm" cleanWorkingDir="true">
+    <pipeline name="BuildTemplate">
+      <stage name="npm-install" cleanWorkingDir="true">
         <jobs>
-          <job name="package">
+          <job name="npm-install">
             <tasks>
               <exec command="npm">
                 <arg>install</arg>
-                <runif status="passed" />
-              </exec>
-              <exec command="npm">
-                <arg>run</arg>
-                <arg>lint</arg>
-                <runif status="passed" />
-              </exec>
-              <exec command="npm">
-                <arg>run</arg>
-                <arg>test</arg>
-                <runif status="passed" />
-              </exec>
-              <exec command="npm">
-                <arg>run</arg>
-                <arg>build</arg>
-                <runif status="passed" />
-              </exec>
-              <exec command="/bin/bash">
-                <arg>-c</arg>
-                <arg>PKG_ID=$GO_PIPELINE_LABEL npm run package</arg>
                 <runif status="passed" />
               </exec>
               <exec command="/bin/bash">
@@ -564,8 +447,78 @@
               </exec>
             </tasks>
             <artifacts>
-              <artifact src="pkg*.zip" dest="pkg" />
               <artifact src="dist*.zip" dest="dist" />
+            </artifacts>
+          </job>
+        </jobs>
+      </stage>
+      <stage name="coding-rules" fetchMaterials="false" cleanWorkingDir="true">
+        <jobs>
+          <job name="lint">
+            <tasks>
+              <fetchartifact pipeline="" stage="npm-install" job="npm-install" srcdir="dist">
+                <runif status="passed" />
+              </fetchartifact>
+              <exec command="unzip" workingdir="dist">
+                <arg>-qq</arg>
+                <arg>*.zip</arg>
+                <runif status="passed" />
+              </exec>
+              <exec command="npm" workingdir="dist">
+                <arg>run</arg>
+                <arg>lint</arg>
+                <runif status="passed" />
+              </exec>
+            </tasks>
+          </job>
+        </jobs>
+      </stage>
+      <stage name="unit-tests" fetchMaterials="false" cleanWorkingDir="true">
+        <jobs>
+          <job name="test">
+            <tasks>
+              <fetchartifact pipeline="" stage="npm-install" job="npm-install" srcdir="dist">
+                <runif status="passed" />
+              </fetchartifact>
+              <exec command="unzip" workingdir="dist">
+                <arg>-qq</arg>
+                <arg>*.zip</arg>
+                <runif status="passed" />
+              </exec>
+              <exec command="npm" workingdir="dist">
+                <arg>run</arg>
+                <arg>test</arg>
+                <runif status="passed" />
+              </exec>
+            </tasks>
+          </job>
+        </jobs>
+      </stage>
+      <stage name="npm-package" fetchMaterials="false" cleanWorkingDir="true">
+        <jobs>
+          <job name="npm-package">
+            <tasks>
+              <fetchartifact pipeline="" stage="npm-install" job="npm-install" srcdir="dist">
+                <runif status="passed" />
+              </fetchartifact>
+              <exec command="unzip" workingdir="dist">
+                <arg>-qq</arg>
+                <arg>*.zip</arg>
+                <runif status="passed" />
+              </exec>
+              <exec command="npm" workingdir="dist">
+                <arg>run</arg>
+                <arg>build</arg>
+                <runif status="passed" />
+              </exec>
+              <exec command="/bin/bash" workingdir="dist">
+                <arg>-c</arg>
+                <arg>PKG_ID=$GO_PIPELINE_LABEL npm run package</arg>
+                <runif status="passed" />
+              </exec>
+            </tasks>
+            <artifacts>
+              <artifact src="dist/pkg*.zip" dest="pkg" />
             </artifacts>
           </job>
         </jobs>
@@ -595,7 +548,6 @@
       </agents>
       <pipelines>
         <pipeline name="Build" />
-        <pipeline name="Build_Master" />
         <pipeline name="Build_PullRequest" />
         <pipeline name="DeployToDev" />
         <pipeline name="DevReview" />
