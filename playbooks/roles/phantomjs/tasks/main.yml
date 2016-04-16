@@ -1,18 +1,18 @@
 - name: Check if phantomjs is already installed
-  stat: path="{{phantomjs_path}}/{{phantomjs_version}}/bin/phantomjs"
+  stat: path="{{phantomjs_path}}/phantomjs-{{phantomjs_version}}-linux-x86_64/bin/phantomjs"
   changed_when: false
   register: phantomjs_installed
 
 - name: Download archive
-  get_url: url=https://bitbucket.org/ariya/phantomjs/downloads/{{phantomjs_version}}.tar.bz2 dest=/tmp/
+  get_url: url=https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-{{phantomjs_version}}-linux-x86_64.tar.bz2 dest=/tmp/
   when: phantomjs_installed.stat.exists == false
 
 - name: Uncompress archive
-  unarchive: src=/tmp/{{phantomjs_version}}.tar.bz2 dest={{phantomjs_path}} copy=no
+  unarchive: src=/tmp/phantomjs-{{phantomjs_version}}-linux-x86_64.tar.bz2 dest={{phantomjs_path}} copy=no
   when: phantomjs_installed.stat.exists == false
 
 - name: Setup phantomjs symlink
-  file: src={{phantomjs_path}}/{{phantomjs_version}} dest={{phantomjs_path}}/phantomjs owner={{phantomjs_user}} group={{phantomjs_group}} state=link
+  file: src={{phantomjs_path}}/phantomjs-{{phantomjs_version}}-linux-x86_64 dest={{phantomjs_path}}/phantomjs owner={{phantomjs_user}} group={{phantomjs_group}} state=link
 
 - name: export phantomjs in ~/.profile
   become: yes

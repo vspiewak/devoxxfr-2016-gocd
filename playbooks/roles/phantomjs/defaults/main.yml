@@ -1,4 +1,4 @@
-phantomjs_version: phantomjs-2.1.1-linux-x86_64
+phantomjs_version: 2.1.1
 phantomjs_path: /opt
 phantomjs_user: "{{ansible_user}}"
 phantomjs_group: "{{ansible_user}}"
