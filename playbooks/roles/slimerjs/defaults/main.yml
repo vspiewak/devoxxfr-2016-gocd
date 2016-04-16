@@ -1,0 +1,4 @@
+slimerjs_version: 0.9.2
+slimerjs_path: /opt
+slimerjs_user: "{{ansible_user}}"
+slimerjs_group: "{{ansible_user}}"

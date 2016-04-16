@@ -3,8 +3,9 @@
   sudo: yes
 
   roles:
-    - common
-    - java
-    - gocd-agent
-    - nvm
+#    - common
+#    - java
+#    - gocd-agent
+#    - nvm
     - phantomjs
+    - slimerjs

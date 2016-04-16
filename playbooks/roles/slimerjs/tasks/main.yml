@@ -1,0 +1,31 @@
+- name: Check if slimerjs is already installed
+  stat: path="{{slimerjs_path}}/slimerjs-{{slimerjs_version}}/slimerjs"
+  changed_when: false
+  register: slimerjs_installed
+
+- name: Download archive
+  get_url: url=http://download.slimerjs.org/releases/{{slimerjs_version}}/slimerjs-{{slimerjs_version}}-linux-x86_64.tar.bz2 dest=/tmp/
+  when: slimerjs_installed.stat.exists == false
+
+- name: Uncompress archive
+  unarchive: src=/tmp/slimerjs-{{slimerjs_version}}-linux-x86_64.tar.bz2 dest={{slimerjs_path}} copy=no
+  when: slimerjs_installed.stat.exists == false
+
+- name: Setup slimerjs symlink
+  file: src={{slimerjs_path}}/slimerjs-{{slimerjs_version}} dest={{slimerjs_path}}/slimerjs owner={{slimerjs_user}} group={{slimerjs_group}} state=link
+
+- name: export slimerjs in ~/.profile
+  become: yes
+  become_user: "{{ slimerjs_user }}"
+  lineinfile: >
+    dest=~/.profile
+    line="export PATH={{slimerjs_path}}/slimerjs:$PATH"
+    create=yes
+
+- name: export slimerjs in ~/.bashrc
+  become: yes
+  become_user: "{{ slimerjs_user }}"
+  lineinfile: >
+    dest=~/.bashrc
+    line="export PATH={{slimerjs_path}}/slimerjs:$PATH"
+    create=yes
