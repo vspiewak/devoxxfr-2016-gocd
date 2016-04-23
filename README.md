@@ -1,6 +1,10 @@
 Devoxx FR 2016 - Continuous Delivery avec GoCD
 ==============================================
 
+Introduction here: [slides.pdf](./slides.pdf)
+
+
+
 Install a GoCD stack on EC2 :
 
   * GoCD Server
