@@ -1,7 +1,7 @@
 Devoxx FR 2016 - Continuous Delivery avec GoCD
 ==============================================
 
-Introduction here: [slides.pdf](./slides.pdf)
+Introduction here: [Slides.pdf](./Slides.pdf)
 
 
 
