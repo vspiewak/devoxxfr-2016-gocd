@@ -7,7 +7,7 @@ nvm:
 hubot:
   user: "admin"
   group: "admin"
-  git: "https://github.com/vspiewak/nono.git"
+  git: "https://github.com/vspiewak/devoxxfr-2016-gocd-nono.git"
   env_vars:
     - { key: "HUBOT_SLACK_TOKEN",                 value: "{{ lookup('env','HUBOT_SLACK_TOKEN') }}" }
     - { key: "HUBOT_TWITTER_CONSUMER_KEY",        value: "{{ lookup('env','HUBOT_TWITTER_CONSUMER_KEY') }}" }

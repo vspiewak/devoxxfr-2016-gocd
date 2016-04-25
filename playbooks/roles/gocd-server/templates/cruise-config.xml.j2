@@ -32,7 +32,7 @@
       <configuration>
         <property>
           <key>url</key>
-          <value>https://github.com/vspiewak/react-redux-boilerplate.git</value>
+          <value>https://github.com/vspiewak/devoxxfr-2016-gocd-sample-app.git</value>
         </property>
       </configuration>
     </scm>
@@ -49,16 +49,16 @@
       </operate>
     </authorization>
     <pipeline name="Build" labeltemplate="${boilerplate[:7]}" isLocked="false" template="BuildTemplate">
-      <trackingtool link="https://github.com/vspiewak/react-redux-boilerplate/issues/${ID}" regex="##(\d+)" />
+      <trackingtool link="https://github.com/vspiewak/devoxxfr-2016-gocd-sample-app/issues/${ID}" regex="##(\d+)" />
       <materials>
-        <git url="https://github.com/vspiewak/react-redux-boilerplate.git" materialName="boilerplate" />
+        <git url="https://github.com/vspiewak/devoxxfr-2016-gocd-sample-app.git" materialName="boilerplate" />
       </materials>
     </pipeline>
     <pipeline name="DeployToDev" labeltemplate="${boilerplate[:7]}" isLocked="false" template="DeployTemplate">
       <params>
         <param name="pipelineName">Build</param>
       </params>
-      <trackingtool link="https://github.com/vspiewak/react-redux-boilerplate/issues/${ID}" regex="##(\d+)" />
+      <trackingtool link="https://github.com/vspiewak/devoxxfr-2016-gocd-sample-app/issues/${ID}" regex="##(\d+)" />
       <materials>
         <pipeline pipelineName="Build" stageName="npm-package" materialName="boilerplate" />
       </materials>
@@ -67,7 +67,7 @@
       <params>
         <param name="room">#dev-team</param>
       </params>
-      <trackingtool link="https://github.com/vspiewak/react-redux-boilerplate/issues/${ID}" regex="##(\d+)" />
+      <trackingtool link="https://github.com/vspiewak/devoxxfr-2016-gocd-sample-app/issues/${ID}" regex="##(\d+)" />
       <materials>
         <pipeline pipelineName="DeployToDev" stageName="acceptance-tests" materialName="boilerplate" />
       </materials>
@@ -76,7 +76,7 @@
       <params>
         <param name="pipelineName">Build/DeployToDev/DevReview</param>
       </params>
-      <trackingtool link="https://github.com/vspiewak/react-redux-boilerplate/issues/${ID}" regex="##(\d+)" />
+      <trackingtool link="https://github.com/vspiewak/devoxxfr-2016-gocd-sample-app/issues/${ID}" regex="##(\d+)" />
       <materials>
         <pipeline pipelineName="DevReview" stageName="validate" materialName="boilerplate" />
       </materials>
@@ -97,13 +97,13 @@
       <params>
         <param name="room">#market-team</param>
       </params>
-      <trackingtool link="https://github.com/vspiewak/react-redux-boilerplate/issues/${ID}" regex="##(\d+)" />
+      <trackingtool link="https://github.com/vspiewak/devoxxfr-2016-gocd-sample-app/issues/${ID}" regex="##(\d+)" />
       <materials>
         <pipeline pipelineName="DeployToDemo" stageName="acceptance-tests" materialName="boilerplate" />
       </materials>
     </pipeline>
     <pipeline name="Performances" labeltemplate="${boilerplate[:7]}" isLocked="false">
-      <trackingtool link="https://github.com/vspiewak/react-redux-boilerplate/issues/${ID}" regex="##(\d+)" />
+      <trackingtool link="https://github.com/vspiewak/devoxxfr-2016-gocd-sample-app/issues/${ID}" regex="##(\d+)" />
       <materials>
         <pipeline pipelineName="DeployToDemo" stageName="acceptance-tests" materialName="boilerplate" />
       </materials>
@@ -169,7 +169,7 @@
       </stage>
     </pipeline>
     <pipeline name="Analysis" labeltemplate="${boilerplate[:7]}" isLocked="false">
-      <trackingtool link="https://github.com/vspiewak/react-redux-boilerplate/issues/${ID}" regex="##(\d+)" />
+      <trackingtool link="https://github.com/vspiewak/devoxxfr-2016-gocd-sample-app/issues/${ID}" regex="##(\d+)" />
       <materials>
         <pipeline pipelineName="DeployToDemo" stageName="acceptance-tests" materialName="boilerplate" />
       </materials>
@@ -231,7 +231,7 @@
   </pipelines>
   <pipelines group="GitHub">
     <pipeline name="Build_PullRequest" labeltemplate="${boilerplate[:7]}" isLocked="false" template="BuildTemplate">
-      <trackingtool link="https://github.com/vspiewak/react-redux-boilerplate/issues/${ID}" regex="##(\d+)" />
+      <trackingtool link="https://github.com/vspiewak/devoxxfr-2016-gocd-sample-app/issues/${ID}" regex="##(\d+)" />
       <materials>
         <scm ref="e52d20eb-7e3e-447a-bc2d-cf202440a625" />
       </materials>
@@ -240,7 +240,7 @@
   <pipelines group="MicroServices">
     <pipeline name="ServiceA" labeltemplate="${ServiceA[:7]}">
       <materials>
-        <git url="https://github.com/vspiewak/nono" materialName="ServiceA" />
+        <git url="https://github.com/vspiewak/devoxxfr-2016-gocd-nono" materialName="ServiceA" />
       </materials>
       <stage name="dummyStage">
         <jobs>
@@ -256,7 +256,7 @@
     </pipeline>
     <pipeline name="ServiceB" labeltemplate="${ServiceB[:7]}">
       <materials>
-        <git url="https://github.com/vspiewak/react-redux-boilerplate" materialName="ServiceB" />
+        <git url="https://github.com/vspiewak/devoxxfr-2016-gocd-sample-app" materialName="ServiceB" />
       </materials>
       <stage name="dummyStage" fetchMaterials="false">
         <jobs>
@@ -411,7 +411,7 @@
             <tasks>
               <exec command="/bin/bash">
                 <arg>-c</arg>
-                <arg>curl -X POST http://{{hubot_server.ec2_private_ip_address}}:8080/hubot/say -d message="You can &lt;https://github.com/vspiewak/react-redux-boilerplate/commit/$GO_PIPELINE_LABEL|review this commit&gt; and then &lt;http://gocd.devoxx.dailybrain.fr/go/pipelines/$GO_PIPELINE_NAME/$GO_PIPELINE_COUNTER/$GO_STAGE_NAME/$GO_STAGE_COUNTER|deploy it&gt; to the next environnement" -d room='#{room}' -d color='##87579B' -d author_name='GoCD' -d author_link="http://gocd.devoxx.dailybrain.fr/go/pipelines/$GO_PIPELINE_NAME/$GO_PIPELINE_COUNTER/$GO_STAGE_NAME/$GO_STAGE_COUNTER" -d title="Version $GO_PIPELINE_LABEL deployed on $GO_ENVIRONMENT_NAME" -d title_link="$APP_URL" -d thumb_url='https://raw.githubusercontent.com/vspiewak/nono/master/assets/gocd_thumb_url.gif'</arg>
+                <arg>curl -X POST http://{{hubot_server.ec2_private_ip_address}}:8080/hubot/say -d message="You can &lt;https://github.com/vspiewak/devoxxfr-2016-gocd-sample-app/commit/$GO_PIPELINE_LABEL|review this commit&gt; and then &lt;http://gocd.devoxx.dailybrain.fr/go/pipelines/$GO_PIPELINE_NAME/$GO_PIPELINE_COUNTER/$GO_STAGE_NAME/$GO_STAGE_COUNTER|deploy it&gt; to the next environnement" -d room='#{room}' -d color='##87579B' -d author_name='GoCD' -d author_link="http://gocd.devoxx.dailybrain.fr/go/pipelines/$GO_PIPELINE_NAME/$GO_PIPELINE_COUNTER/$GO_STAGE_NAME/$GO_STAGE_COUNTER" -d title="Version $GO_PIPELINE_LABEL deployed on $GO_ENVIRONMENT_NAME" -d title_link="$APP_URL" -d thumb_url='https://raw.githubusercontent.com/vspiewak/devoxxfr-2016-gocd-nono/master/assets/gocd_thumb_url.gif'</arg>
                 <runif status="passed" />
               </exec>
             </tasks>
